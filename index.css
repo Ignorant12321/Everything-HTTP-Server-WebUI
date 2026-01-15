@@ -945,7 +945,7 @@ svg,
     flex-direction: column;
 
     /* 默认背景：深色遮罩（用于视频/图片） */
-    background: rgba(0, 0, 0, 0.65);
+    background: rgba(0, 0, 0, 0.75);
 
     /* 动画过渡属性 */
     opacity: 0;
@@ -965,14 +965,24 @@ svg,
 
 /* 3. 音乐模式：背景透明 */
 .viewer-modal.music-mode {
-    /* 几乎全透明，只保留一点点遮罩防止文字混淆，或者完全透明 */
-    background: rgba(0, 0, 0, 0.01) !important;
+    background: transparent !important;
     backdrop-filter: none;
+    /* 音乐模式下，让模态框背景穿透点击，但内容区域（播放器）可点击 */
+    pointer-events: none !important;
 }
 
-/* 音乐模式下，让模态框背景穿透点击，但内容区域（播放器）可点击 */
-.viewer-modal.music-mode {
-    pointer-events: none;
+.file-container {
+    pointer-events: none !important;
+}
+
+.viewer-content {
+    pointer-events: none !important;
+}
+
+/* 确保位于其中的“音频播放器本体”是可以点击的 */
+.viewer-modal.music-mode .audio-player-container {
+    pointer-events: auto !important;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
 }
 
 .viewer-modal.music-mode .viewer-content,
@@ -1373,7 +1383,150 @@ svg,
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 20px;
+    gap: 15px;
+    position: relative;
+    width: 100%;
+    margin-top: 15px;
+}
+
+/* ================= 更新后的音量弹窗样式 ================= */
+
+/* 1. 调整弹窗容器：增加高度，改为垂直排列布局 */
+/* ==================== 1. 父容器：强制尺寸对齐 ==================== */
+.volume-wrapper {
+    position: relative;
+    /* 定位基准 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* 【关键修正】强制宽高与图标按钮一致，确保中心点完全重合 */
+    width: 32px;
+    height: 32px;
+
+    flex-shrink: 0;
+    /* 禁止被压缩 */
+    z-index: 20;
+    margin: 0 4px;
+    /* 给左右留点间距 */
+}
+
+/* ==================== 2. 弹窗：精准定位 ==================== */
+.volume-popup {
+    /* 绝对定位 */
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-12px) scale(0.9);
+    width: 36px;
+    height: 140px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 12px 0;
+    background: rgba(30, 30, 30, 0.95);
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 100;
+}
+
+/* ==================== 修复：鼠标移动时消失的问题 ==================== */
+
+/* 使用伪元素在弹窗底部创建一个“隐形桥梁” */
+.volume-popup::after {
+    content: '';
+    position: absolute;
+
+    /* 让这个块位于弹窗的正下方 */
+    top: 100%;
+    left: 0;
+
+    /* 宽度占满，高度足够填补空隙 */
+    width: 100%;
+    height: 30px;
+    /* 30px 足够覆盖图标和弹窗之间的距离 */
+
+    background: transparent;
+    /* 设置为透明，用户看不见，但鼠标能感应到 */
+    /* background: red;  <-- 如果调试时想看清楚桥在哪里，可以取消这行注释 */
+}
+
+/* 悬浮显示状态 */
+.volume-wrapper:hover .volume-popup,
+.volume-popup:hover {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(-12px) scale(1);
+}
+
+/* ==================== 3. 文本与滑块优化 ==================== */
+
+/* 百分比文字 */
+.volume-text-display {
+    font-size: 10px !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    margin-bottom: 0 !important;
+    text-align: center;
+    width: 100%;
+    height: 14px;
+    line-height: 14px;
+    flex-shrink: 0;
+}
+
+/* 垂直滑块：修正旋转位移 */
+.volume-slider-vertical {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    outline: none;
+    cursor: pointer;
+
+    /* 原始尺寸：宽 100px (变成高), 高 30px (变成宽) */
+    width: 90px;
+    height: 30px;
+
+    /* 旋转 */
+    transform: rotate(-90deg);
+
+    /* 【核心修正】因为旋转中心是中心点，旋转后两头会留白
+       使用 margin 把它“顶”回正确的位置 */
+    margin-top: 30px;
+    margin-bottom: 30px;
+
+    flex-shrink: 0;
+}
+
+/* --- 滑块轨道 (变细) --- */
+.volume-slider-vertical::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 3px;
+    /* 极细轨道 */
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    border: none;
+}
+
+/* --- 滑块圆点 --- */
+.volume-slider-vertical::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    margin-top: -3.5px;
+    /* (10 - 3) / 2 * -1 = -3.5 垂直居中 */
+    transition: transform 0.1s;
+}
+
+.volume-slider-vertical:active::-webkit-slider-thumb {
+    transform: scale(1.3);
 }
 
 .play-btn {
@@ -1410,6 +1563,32 @@ svg,
 /* 歌词区域允许文本选择或滚动，鼠标恢复默认 */
 .audio-section-lyrics {
     cursor: default;
+}
+
+/* ##########
+   新增：固定模式下的穿透逻辑
+   ########## */
+
+/* 当播放器处于 pinned 状态时 */
+.audio-player-container.pinned {
+    /* 核心：容器本身取消鼠标事件响应，实现穿透 */
+    pointer-events: none !important;
+}
+
+/* 但是，必须恢复内部控件的鼠标响应，否则无法切歌或暂停 */
+.audio-player-container.pinned .audio-section-controls button,
+.audio-player-container.pinned .audio-progress-container,
+.audio-player-container.pinned .volume-wrapper,
+.audio-player-container.pinned .volume-popup-panel {
+    pointer-events: auto !important;
+}
+
+/* 隐藏不必要的元素以减少干扰 */
+.audio-player-container.pinned .audio-visualizer,
+.audio-player-container.pinned .audio-section-lyrics,
+.audio-player-container.pinned .audio-section-info {
+    /* 如果希望歌词也能穿透点击，这里可以保持 pointer-events: none */
+    pointer-events: none;
 }
 
 /* --- 移动端适配逻辑 --- */
@@ -1904,6 +2083,25 @@ svg,
     /* 初始隐藏 */
 }
 
+/* --- 音量控制条样式 --- */
+
+.volume-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    outline: none;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    background: #fff;
+    border-radius: 50%;
+    cursor: pointer;
+}
 
 /* <!-- ########## -->
 <!-- 动画效果 -->
