@@ -1094,7 +1094,6 @@ svg,
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: grab;
 }
 
 .image-viewer-container:active {

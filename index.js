@@ -1739,16 +1739,25 @@ const app = {
             let startX, startY, initialLeft, initialTop;
 
             const onMouseDown = (e) => {
-                // 1. 过滤：如果是点击按钮、进度条、歌词区域，则不触发拖拽
-                if (e.target.closest('button') ||
-                    e.target.closest('.audio-progress-container') ||
-                    e.target.closest('.audio-section-lyrics') ||
-                    e.target.closest('.cc-btn') ||
-                    e.target.closest('.icon-btn') ||
-                    e.target.closest('.volume-wrapper' ||
-                        e.target.closest('.audio-section-info') ||
-                        e.target.closest('.audio-section-info img') ||
-                        e.target.closest('.audio-meta'))) {
+                // 1. 定义不触发拖拽的“白名单”选择器
+                // 技巧：.audio-section-info 会自动涵盖它内部的 img 和 text，所以不需要单独写 img
+                const noDragSelector = [
+                    'button',
+                    '.audio-progress-container',
+                    '.audio-section-lyrics',
+                    '.cc-btn',
+                    '.icon-btn',
+                    '.volume-wrapper',
+                    '.audio-section-info img',
+                    '.audio-meta'
+                ].join(','); // 将数组合并成 "button, .class1, .class2..." 的字符串
+
+                // 2. 单次检测 + 设置光标
+                if (e.target.closest(noDragSelector)) {
+                    // 设置光标为默认箭头
+                    // 注意：通常这里设为 'default' 或 'auto'，具体取决于你希望它恢复成什么样
+                    // 如果 el 是你的播放器容器：
+                    el.style.cursor = 'default';
                     return;
                 }
 
