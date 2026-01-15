@@ -5,7 +5,7 @@ Everything的HTTP服务器界面UI，支持文件预览/查看功能
 ## 使用方法
 
 1. 下载
-Everything-HTTP Server-WebUI压缩包并解压到指定位置，如：`D:\Data\Share\config`，注意文件目录结构：
+Everything-HTTP-Server-WebUI压缩包并解压到指定位置，如：`D:\Data\Share\config`，注意文件目录结构：
 ![alt text](.assest/image-2.png)
 2. 本地化
 更改文件内容：打开`index.js`文件，修改默认位置`defaultPath`对应的值，上下文如图：
