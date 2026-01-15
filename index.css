@@ -1,0 +1,1953 @@
+/* ##########
+    // 基础样式
+    ########## */
+
+:root {
+    /* Win11 亮色主题变量 */
+    --bg-mica: #f3f3f3;
+    --bg-surface: #ffffff;
+    --bg-address: #ffffff;
+    --bg-hover: #e0e0e0;
+    --text-primary: #202020;
+    --text-secondary: #5d5d5d;
+    --accent-color: #0067c0;
+    --accent-bg: #e5f3ff;
+    --border-color: #e5e5e5;
+    --divider-color: #d1d1d1;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --shadow-flyout: 0 8px 16px rgba(0, 0, 0, 0.14);
+    --viewer-bg: #ffffff;
+    --viewer-text: #333333;
+    --scrollbar-track: transparent;
+    --scrollbar-thumb: #c1c1c1;
+    --scrollbar-thumb-hover: #a8a8a8;
+    --mobile-blur-bg: rgba(255, 255, 255, 0.85);
+    --mobile-blur-border: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="dark"] {
+    /* Win11 暗色主题变量 */
+    --bg-mica: #202020;
+    --bg-surface: #191919;
+    --bg-address: #333333;
+    --bg-hover: #3a3a3a;
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0a0;
+    --accent-color: #4cc2ff;
+    --accent-bg: #3a3a3a;
+    --border-color: #383838;
+    --divider-color: #444444;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --shadow-flyout: 0 8px 16px rgba(0, 0, 0, 0.4);
+    --viewer-bg: #2c2c2c;
+    --viewer-text: #e0e0e0;
+    --scrollbar-track: transparent;
+    --scrollbar-thumb: #555;
+    --scrollbar-thumb-hover: #777;
+    --mobile-blur-bg: rgba(30, 30, 30, 0.85);
+    --mobile-blur-border: rgba(255, 255, 255, 0.1);
+}
+
+* {
+    box-sizing: border-box;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    margin: 0;
+    font-family: "Segoe UI Variable", "Segoe UI", "Microsoft YaHei", sans-serif;
+    background-color: var(--bg-mica);
+    color: var(--text-primary);
+    height: 100vh;
+    height: 100dvh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-size: 14px;
+}
+
+/* 主题过渡 */
+.sidebar,
+.file-pane,
+.details-pane,
+.status-bar,
+.flyout-menu,
+.address-input,
+input,
+button,
+svg,
+.icon-btn {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, fill 0.3s ease;
+}
+
+/* ##########
+    // 遮罩层
+    ########## */
+
+/* 遮罩层默认样式 */
+.sidebar-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    z-index: 70;
+    /* 默认隐藏 */
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+/* 当侧边栏打开时，激活遮罩层 */
+.sidebar.show-mobile~.sidebar-mask {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* 确保侧边栏层级最高 */
+.sidebar {
+    z-index: 80;
+}
+
+/* ##########
+    // 自定义滚动条
+    ########## */
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb);
+    border-radius: 5px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--scrollbar-thumb-hover);
+}
+
+/* ##########
+    // 头部导航栏
+    ########## */
+
+.app-header {
+    background-color: var(--bg-mica);
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 50px;
+    flex-shrink: 0;
+    z-index: 20;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.nav-controls {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.icon-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.icon-btn:active:not(:disabled) {
+    transform: scale(0.92);
+    background-color: rgba(0, 0, 0, 0.1);
+    /* 增加按压背景变深 */
+}
+
+.icon-btn:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
+#mobileMenuBtn {
+    display: none;
+}
+
+/* ##########
+    // 地址栏容器
+    ########## */
+
+.address-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background-color: var(--bg-address);
+    border-bottom: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 0 8px 0 12px;
+    height: 34px;
+    margin: 0 8px;
+    transition: 0.2s;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    min-width: 100px;
+    position: relative;
+}
+
+.address-container:focus-within {
+    background-color: var(--bg-surface);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(0, 103, 192, 0.2);
+}
+
+.address-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    font-size: 14px;
+    margin-left: 4px;
+    font-family: inherit;
+    width: 100%;
+    height: 100%;
+}
+
+.clear-btn {
+    display: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+}
+
+.clear-btn:hover {
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.address-input:not(:placeholder-shown)+.clear-btn {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .status-bar {
+        flex-direction: column;
+        height: auto;
+        gap: 10px;
+        padding-top: 10px;
+        padding-bottom: max(10px, env(safe-area-inset-bottom));
+        justify-content: center;
+    }
+
+    #statusLeft {
+        width: 100%;
+        text-align: center;
+        font-size: 13px;
+        order: 1;
+    }
+
+    .pagination-controls {
+        width: 100%;
+        justify-content: center;
+        order: 2;
+        flex-wrap: wrap;
+    }
+
+    .pagination-controls .icon-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+        margin: 0 2px;
+    }
+
+    .pagination-controls .page-input {
+        width: 40px;
+        height: 32px;
+        font-size: 14px;
+    }
+
+    #totalPages {
+        font-size: 13px;
+        margin: 0 4px;
+    }
+}
+
+/* ##########
+    // 下拉菜单
+    ########## */
+.flyout-menu {
+    position: absolute;
+    top: 55px;
+    right: 10px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-flyout);
+    padding: 4px;
+    min-width: 220px;
+    display: none;
+    flex-direction: column;
+    z-index: 100;
+}
+
+.flyout-menu.show {
+    display: flex;
+    animation: fadeIn 0.1s ease-out;
+}
+
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.menu-item:hover {
+    background-color: var(--bg-hover);
+}
+
+.menu-icon {
+    width: 16px;
+    display: flex;
+    justify-content: center;
+}
+
+.menu-label {
+    flex: 1;
+}
+
+.menu-check {
+    color: var(--accent-color);
+    font-weight: bold;
+    opacity: 0;
+}
+
+.menu-separator {
+    height: 1px;
+    background: var(--border-color);
+    margin: 4px 6px;
+}
+
+.toggle-switch {
+    width: 32px;
+    height: 18px;
+    background: var(--border-color);
+    border-radius: 9px;
+    position: relative;
+    transition: 0.3s;
+}
+
+.toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    background: white;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.menu-item.active .toggle-switch {
+    background: var(--accent-color);
+}
+
+.menu-item.active .toggle-switch::after {
+    transform: translateX(14px);
+}
+
+/* --- 主布局容器 --- */
+.layout-container {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    min-height: 0;
+    height: 100%;
+}
+
+/* --- 侧边栏 (Sidebar) --- */
+.sidebar {
+    width: 240px;
+    background-color: var(--bg-mica);
+    display: flex;
+    flex-direction: column;
+    padding: 12px 8px;
+    gap: 2px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    border-right: 1px solid var(--border-color);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-group-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    padding: 12px 12px 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    color: var(--text-primary);
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar-item:hover {
+    background-color: var(--bg-hover);
+}
+
+.sidebar-item.active {
+    background-color: var(--bg-hover);
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+.tree-toggle {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    color: var(--text-secondary);
+    margin-left: -6px;
+    transition: 0.2s;
+}
+
+.tree-toggle:hover {
+    background-color: var(--bg-hover);
+}
+
+.tree-toggle.rotated {
+    transform: rotate(90deg);
+}
+
+.tree-children {
+    display: none;
+    flex-direction: column;
+    margin-left: 10px;
+    border-left: 1px solid var(--border-color);
+    padding-left: 4px;
+}
+
+.tree-children.open {
+    display: flex;
+}
+
+/* --- 文件列表区域 (File Pane) --- */
+.file-pane {
+    flex: 1;
+    background-color: var(--bg-surface);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+.grid-header {
+    display: flex;
+    height: 36px;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 12px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    background: var(--bg-surface);
+    user-select: none;
+    overflow: hidden;
+}
+
+.header-cell {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    height: 100%;
+    white-space: nowrap;
+    cursor: pointer;
+    border-right: 1px solid transparent;
+}
+
+.header-cell:hover {
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.header-cell:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 25%;
+    bottom: 25%;
+    width: 1px;
+    background-color: var(--divider-color);
+    pointer-events: none;
+}
+
+.resize-handle {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 12px;
+    cursor: col-resize;
+    z-index: 10;
+    background: transparent;
+    transform: translateX(50%);
+}
+
+#fileList {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 40px;
+}
+
+.cell-name {
+    min-width: 100px;
+}
+
+.file-row {
+    display: flex;
+    height: 40px;
+    align-items: center;
+    border-bottom: 1px solid transparent;
+    cursor: default;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+    border-radius: var(--radius-sm);
+    margin: 1px 4px;
+}
+
+.file-row:active {
+    transform: scale(0.98);
+    background-color: var(--bg-hover) !important;
+}
+
+.sidebar-item:active {
+    transform: scale(0.98);
+}
+
+.file-row:hover {
+    background-color: var(--bg-hover);
+}
+
+.file-row.selected {
+    background-color: var(--accent-bg);
+}
+
+.file-row.selected .file-name {
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+.cell {
+    padding: 0 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    justify-content: flex-start;
+}
+
+.cell-icon {
+    font-size: 18px;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.cell-name {
+    color: var(--text-primary);
+}
+
+.cell-meta,
+.cell-type {
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+#fileList.view-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    grid-auto-rows: 130px;
+    gap: 8px;
+    padding: 16px;
+    align-content: start;
+}
+
+#fileList.view-grid .file-row {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    padding: 8px;
+    border-radius: var(--radius-md);
+    border: 1px solid transparent;
+    align-items: center;
+    text-align: center;
+}
+
+#fileList.view-grid .file-row:hover {
+    background-color: var(--bg-hover);
+}
+
+#fileList.view-grid .file-row.selected {
+    background-color: var(--accent-bg);
+    border-color: rgba(0, 0, 0, 0.05);
+}
+
+#fileList.view-grid .cell-icon {
+    font-size: 48px;
+    margin-bottom: 8px;
+    flex: 1;
+    align-items: flex-end;
+    width: 100%;
+    justify-content: center;
+}
+
+#fileList.view-grid .cell-name {
+    felex-shrink: 1;
+    min-width: 200px;
+    font-size: 13px;
+    width: 100%;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    white-space: normal;
+    line-height: 1.3;
+    height: 34px;
+    overflow: hidden;
+    justify-content: center;
+    text-align: center;
+}
+
+#fileList.view-grid .cell-meta,
+#fileList.view-grid .cell-type {
+    display: none;
+}
+
+/* --- 详情面板 (Details Pane) --- */
+.details-pane {
+    width: 280px;
+    background-color: var(--bg-surface);
+    border-left: 1px solid var(--border-color);
+    display: none;
+    flex-direction: column;
+    padding: 20px;
+    overflow-y: auto;
+    position: relative;
+    z-index: 40;
+    transition: transform 0.3s cubic-bezier(0.1, 0.7, 0.1, 1);
+}
+
+.details-pane.active {
+    display: flex;
+}
+
+/* 桌面端拖拽把手 */
+.drag-handle-vertical {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 12px;
+    cursor: w-resize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--border-color);
+    font-size: 10px;
+    user-select: none;
+    z-index: 50;
+}
+
+.drag-handle-vertical::after {
+    content: '|||';
+    font-weight: bold;
+    color: var(--text-secondary);
+    opacity: 0.3;
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    letter-spacing: -2px;
+}
+
+.drag-handle-vertical:hover::after {
+    opacity: 0.8;
+    color: var(--accent-color);
+}
+
+.preview-box {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background-color: var(--bg-mica);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    font-size: 64px;
+    color: var(--text-secondary);
+}
+
+.preview-row {
+    display: flex;
+    height: 40px;
+    align-items: center;
+    border-bottom: 1px solid transparent;
+    cursor: default;
+    transition: background-color 0.1s;
+}
+
+.preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.preview-icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    display: inline-block;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+
+/* 图标容器内的图片/SVG：适配容器尺寸 */
+.preview-icon img,
+.preview-icon svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+.large-name {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    word-break: break-all;
+    line-height: 1.4;
+    margin-left: 8px;
+}
+
+.btn-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.action-btn {
+    flex: 1;
+    padding: 6px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.action-btn:hover {
+    background-color: var(--bg-hover);
+}
+
+.action-btn.primary {
+    background-color: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+.action-btn.primary:hover {
+    opacity: 0.9;
+}
+
+.info-group {
+    margin-bottom: 12px;
+}
+
+.info-label {
+    color: var(--text-secondary);
+    font-size: 12px;
+    margin-bottom: 2px;
+}
+
+.info-value {
+    color: var(--text-primary);
+    font-size: 13px;
+    word-break: break-all;
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+.info-value.copyable:hover {
+    background-color: var(--bg-hover);
+    cursor: pointer;
+}
+
+.info-value.copyable:active {
+    background-color: var(--border-color);
+}
+
+/* --- 任务栏 (Task Bar) --- */
+.task-bar {
+    height: 36px;
+    background-color: var(--bg-address);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    overflow-x: auto;
+    gap: 4px;
+    z-index: 70;
+    flex-shrink: 0;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    font-size: 12px;
+    max-width: 150px;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.task-item:hover {
+    background-color: var(--bg-hover);
+}
+
+.task-item.active {
+    background-color: var(--accent-bg);
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+.task-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.task-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    font-size: 10px;
+    color: var(--text-secondary);
+}
+
+.task-close:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    color: red;
+}
+
+/* --- 底部状态栏 (Footer) --- */
+.status-bar {
+    height: auto;
+    min-height: 28px;
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-top: 4px;
+    padding-bottom: 4px;
+    background-color: var(--bg-surface);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 12px;
+    padding-right: 12px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    z-index: 10;
+    flex-shrink: 0;
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.page-input {
+    width: 36px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    background: var(--bg-address);
+    color: var(--text-primary);
+    font-size: 12px;
+    padding: 2px;
+}
+
+/* --- 预览模态框 (Viewer Modal) --- */
+/* ########## 
+   修改：预览模态框与动画核心样式
+   ########## */
+
+/* 1. 模态框基础：不再使用 display:none，而是使用 visibility/opacity 以支持动画 */
+.viewer-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    /* 始终保持 flex 布局 */
+    flex-direction: column;
+
+    /* 默认背景：深色遮罩（用于视频/图片） */
+    background: rgba(0, 0, 0, 0.65);
+
+    /* 动画过渡属性 */
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    /* 隐藏时不阻挡点击 */
+    transition: background-color 0.4s ease, opacity 0.3s ease, visibility 0.3s;
+}
+
+/* 2. 打开状态 */
+.viewer-modal.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    /* 恢复交互 */
+}
+
+/* 3. 音乐模式：背景透明 */
+.viewer-modal.music-mode {
+    /* 几乎全透明，只保留一点点遮罩防止文字混淆，或者完全透明 */
+    background: rgba(0, 0, 0, 0.01) !important;
+    backdrop-filter: none;
+}
+
+/* 音乐模式下，让模态框背景穿透点击，但内容区域（播放器）可点击 */
+.viewer-modal.music-mode {
+    pointer-events: none;
+}
+
+.viewer-modal.music-mode .viewer-content,
+.viewer-modal.music-mode .viewer-toolbar {
+    pointer-events: auto;
+}
+
+/* 4. 工具栏：透明磨砂 & 颜色自适应 */
+.viewer-toolbar {
+    height: 48px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    z-index: 10;
+
+    /* 颜色自适应：跟随主题变量 */
+    color: var(--text-primary);
+
+    /* 背景透明磨砂效果 */
+    /* 注意：这里使用 RGB 变量或 rgba 配合 var 为了通用性，
+       为了简单适配你的现有变量，我们使用半透明背景 + 模糊 */
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(128, 128, 128, 0.1);
+
+    /* 动画：位移 */
+    transform: translateY(0);
+    transition: transform 0.4s cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* 暗色模式下的工具栏适配 */
+[data-theme="dark"] .viewer-toolbar {
+    background: rgba(30, 30, 30, 0.75);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 5. 内容区域（图片/视频/播放器）容器 */
+.viewer-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+
+    /* 动画基点：底部中心 */
+    transform-origin: bottom center;
+    transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.3s ease;
+    transform: scale(0.95);
+    opacity: 0;
+}
+
+/* 打开状态 */
+.viewer-modal.open .viewer-content {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* ########## 
+   关键：最小化动画逻辑
+   ########## */
+
+/* 当添加 .minimized 类时 */
+.viewer-modal.minimized {
+    /* 背景立即透明，且允许点击穿透到底部列表 */
+    background-color: transparent !important;
+    pointer-events: none;
+    /* 稍微延迟一点隐藏 visibility，保证动画播完 */
+    transition-delay: 0s;
+}
+
+/* A. 工具栏动画：向上滑出屏幕 */
+.viewer-modal.minimized .viewer-toolbar {
+    transform: translateY(-100%);
+}
+
+/* B. 内容动画：向下滑动至任务栏并缩小消失 */
+.viewer-modal.minimized .viewer-content {
+    /* 向下位移 80vh 并缩小，模拟收入任务栏的效果 */
+    transform: translateY(80vh) scale(0.1);
+    opacity: 0;
+}
+
+/* 修正工具栏图标颜色（移除行内 style="color:white" 后需要此样式） */
+.viewer-toolbar .icon-btn {
+    color: inherit;
+    /* 跟随 toolbar 的 color */
+}
+
+.file-container {
+    width: 100%;
+    height: 100%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.file-container.active {
+    display: flex;
+}
+
+.image-viewer-container {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+}
+
+.image-viewer-container:active {
+    cursor: grabbing;
+}
+
+.image-viewer-container img {
+    max-width: 100%;
+    max-height: 100%;
+    transition: transform 0.1s ease-out;
+    transform-origin: center center;
+    user-select: none;
+}
+
+.viewer-text {
+    background: var(--viewer-bg);
+    color: var(--viewer-text);
+    padding: 20px;
+    width: 80%;
+    height: 90%;
+    overflow: auto;
+    border-radius: 4px;
+    white-space: pre-wrap;
+    font-family: monospace;
+    border: 1px solid var(--border-color);
+}
+
+.viewer-iframe {
+    width: 80%;
+    height: 90%;
+    background: white;
+    border: none;
+    border-radius: 4px;
+}
+
+/* ##########
+    // 音频播放器
+    ########## */
+
+/* --- 音频播放器重构样式 --- */
+
+/* 1. 容器：默认采用 Grid 布局 (适配 PC 和 横屏手机) */
+.audio-player-container {
+    /* 1. 改为绝对定位，以便拖动 */
+    position: absolute;
+    /* 2. 初始居中显示 */
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    width: 90%;
+    max-width: 900px;
+    height: 80vh;
+    max-height: 600px;
+
+    /* 玻璃拟态和边框 */
+    background: rgba(30, 30, 30, 0.85);
+    border-radius: 12px;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    grid-template-rows: 1fr auto;
+    grid-template-areas:
+        "info lyrics"
+        "ctrl lyrics";
+    overflow: hidden;
+
+    cursor: move;
+    /* 4. 确保层级高于背景 Canvas */
+    z-index: 10;
+    transition: color 0.5s ease;
+}
+
+/* 全屏模式下的样式覆盖 */
+.audio-player-container:fullscreen {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: none !important;
+    max-height: none !important;
+    border-radius: 0 !important;
+    border: none !important;
+    background: #000;
+    /* 兜底背景色 */
+}
+
+.audio-player-container::-webkit-full-screen {
+    width: 100%;
+    height: 100%;
+}
+
+/* 2. 各个区域定义 */
+
+/* 动态背景层 */
+.audio-bg-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #1e1e1e, #141414);
+    /* 默认深色 */
+    z-index: 0;
+    transition: background 1s ease;
+    /* 背景色平滑过渡 */
+}
+
+/* 频谱 Canvas */
+.audio-visualizer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* 或者 50% 如果只想显示在下半部分 */
+    z-index: 1;
+    /* 在背景之上 */
+    pointer-events: none;
+    /* 让鼠标事件穿透，不影响按钮点击 */
+    opacity: 0.6;
+    /* 稍微透明一点，不要太抢眼 */
+}
+
+/* 内容区域层级提升 */
+.audio-section-info,
+.audio-section-lyrics,
+.audio-section-controls {
+    z-index: 2;
+    /* 确保在 Canvas 之上 */
+    position: relative;
+}
+
+/* 歌词区域颜色适配 */
+.audio-section-lyrics {
+    color: inherit;
+    /* 跟随父容器颜色 */
+    /* 保留原有的 mask-image */
+}
+
+/* 歌词高亮颜色 */
+.lyric-line.active {
+    color: var(--accent-color);
+    /* 或者使用更亮的对比色 */
+    filter: brightness(1.5);
+    /* 让高亮行更亮 */
+    text-shadow: 0 0 10px currentColor;
+}
+
+.audio-section-info {
+    grid-area: info;
+    padding: 30px 20px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 0;
+    user-select: none;
+    /* 防止溢出 */
+}
+
+.audio-section-lyrics {
+    grid-area: lyrics;
+    padding: 30px;
+    background: rgba(0, 0, 0, 0.2);
+    /* 稍微深一点的背景区分 */
+    overflow-y: auto;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 15px;
+    line-height: 2.2;
+    mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+}
+
+.audio-section-controls {
+    grid-area: ctrl;
+    padding: 10px 20px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background: transparent;
+}
+
+/* 3. 元素细节样式 */
+.audio-cover-img {
+    width: 180px;
+    height: 180px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+    object-fit: cover;
+    margin-bottom: 20px;
+}
+
+.audio-cover-img.playing {
+    animation: spin 20s linear infinite;
+    border-radius: 50%;
+}
+
+.audio-cover-placeholder {
+    width: 180px;
+    height: 180px;
+    background: #444;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 64px;
+    margin-bottom: 20px;
+}
+
+.audio-meta {
+    width: 100%;
+    overflow: hidden;
+}
+
+.audio-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.audio-artist {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* 进度条行 (时间 - 条 - 时间) */
+.audio-progress-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.audio-time {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    width: 40px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+.audio-progress-container {
+    flex: 1;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+}
+
+.audio-progress-bar {
+    height: 100%;
+    background: var(--accent-color);
+    width: 0%;
+    border-radius: 2px;
+    position: relative;
+}
+
+/* 增加进度条末端的小圆点 */
+.audio-progress-bar::after {
+    content: '';
+    position: absolute;
+    right: -4px;
+    top: -3px;
+    width: 10px;
+    height: 10px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.audio-progress-container:hover .audio-progress-bar::after {
+    opacity: 1;
+}
+
+.audio-btn-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.play-btn {
+    width: 48px;
+    height: 48px;
+    background: white;
+    color: black;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.play-btn:active {
+    transform: scale(0.95);
+}
+
+
+/* 关键：防止内部控件触发拖拽 */
+.audio-section-controls button,
+.audio-progress-container,
+.lyric-line,
+.audio-lyrics-section,
+/* 歌词区域通常用于滚动，不建议作为拖拽把手 */
+.cc-btn {
+    cursor: pointer;
+    /* 恢复点击手势 */
+}
+
+/* 歌词区域允许文本选择或滚动，鼠标恢复默认 */
+.audio-section-lyrics {
+    cursor: default;
+}
+
+/* --- 移动端适配逻辑 --- */
+
+/* 场景 A: 竖屏手机 (宽度小于 768 且 高度大于宽度) */
+@media (max-width: 768px) and (orientation: portrait) {
+    .audio-player-container {
+        display: flex;
+        /* 改用 Flex */
+        flex-direction: column;
+        /* 垂直排列 */
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+        border: none;
+        max-height: none;
+        cursor: default;
+    }
+
+    /* 1. 封面区域 */
+    .audio-section-info {
+        flex: 0 0 auto;
+        /* 不伸缩 */
+        padding: 40px 20px 20px;
+    }
+
+    .audio-cover-img,
+    .audio-cover-placeholder {
+        width: 140px;
+        height: 140px;
+        /* 稍微缩小封面 */
+    }
+
+    /* 2. 歌词区域 (核心：flex: 1 让它占据中间所有剩余空间) */
+    .audio-section-lyrics {
+        flex: 1;
+        width: 100%;
+        border-radius: 12px 12px 0 0;
+        /* 视觉上更有层次 */
+        background: rgba(0, 0, 0, 0.1);
+        padding: 10px 20px;
+    }
+
+    /* 3. 控制区域 */
+    .audio-section-controls {
+        flex: 0 0 auto;
+        /* 固定在底部 */
+        padding: 20px 20px 40px;
+        /* 底部留多点空隙 */
+        background: transparent;
+    }
+}
+
+/* 场景 B: 横屏手机 (高度较小) */
+@media (max-height: 500px) and (orientation: landscape) {
+    .audio-player-container {
+        width: 100%;
+        height: 100%;
+        max-height: none;
+        border-radius: 0;
+        /* 保持 Grid 布局，但调整比例 */
+        grid-template-columns: 280px 1fr;
+    }
+
+    .audio-cover-img,
+    .audio-cover-placeholder {
+        width: 100px;
+        height: 100px;
+        /* 缩小封面以适应横屏 */
+        margin-bottom: 10px;
+    }
+
+    .audio-section-info {
+        padding: 10px;
+        justify-content: center;
+    }
+
+    .audio-section-controls {
+        padding: 10px 20px;
+    }
+}
+
+.audio-cover-img.playing {
+    animation: spin 10s linear infinite;
+    border-radius: 50%;
+}
+
+
+.audio-info {
+    text-align: center;
+    color: white;
+    width: 100%;
+}
+
+.audio-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.audio-artist {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.audio-controls-area {
+    width: 100%;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.audio-progress-container {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+}
+
+.audio-progress-bar {
+    height: 100%;
+    background: var(--accent-color);
+    width: 0%;
+    border-radius: 2px;
+}
+
+.audio-btn-row {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    align-items: center;
+}
+
+.audio-lyrics-section {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 15px;
+    line-height: 2;
+    scroll-behavior: smooth;
+    position: relative;
+    /* 蒙版效果 */
+    mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+}
+
+.lyric-line {
+    transition: all 0.3s;
+    cursor: pointer;
+    padding: 4px 0;
+    white-space: pre-wrap;
+    /* 允许换行 */
+}
+
+.lyric-line.active {
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    transform: scale(1.05);
+}
+
+/* 视频字幕选择器样式 */
+.cc-btn-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+}
+
+.cc-btn {
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    display: none;
+    /* 默认隐藏，有字幕时显示 */
+    backdrop-filter: blur(5px);
+}
+
+.cc-btn:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+@media (max-width: 768px) {
+    .audio-player-container {
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+    }
+
+    .audio-cover-section {
+        width: 100%;
+        height: auto;
+        flex-shrink: 0;
+        padding: 15px;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .audio-cover-img {
+        width: 120px;
+        height: 120px;
+        margin-bottom: 10px;
+    }
+}
+
+.fallback-msg {
+    text-align: center;
+    color: white;
+}
+
+.fallback-link {
+    color: #4cc2ff;
+    text-decoration: underline;
+    cursor: pointer;
+    display: inline-block;
+    margin-top: 8px;
+}
+
+.toast {
+    position: fixed;
+    left: 50%;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 2000;
+    bottom: 30px;
+    transform: translateX(-50%) translateY(20px) scale(0.9);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    background: rgba(30, 30, 30, 0.85);
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+    bottom: 50px;
+}
+
+.center-msg {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-secondary);
+}
+
+/* --- 移动端适配 (Responsive) --- */
+@media (max-width: 768px) {
+    .app-header {
+        height: auto;
+        padding: 8px;
+        /* 统一内边距 */
+        /* 使用 Flex 布局替代 Grid，方便换行 */
+        display: flex;
+        flex-wrap: wrap;
+        /* 允许换行 */
+        gap: 8px;
+        /* 元素间距 */
+        justify-content: space-between;
+        /* 两端对齐辅助 */
+    }
+
+    /* 核心修改：地址栏强制占满第一行 */
+    .address-container {
+        width: 100%;
+        /* 强制满宽 */
+        margin: 0;
+        height: 40px;
+        padding-left: 12px;
+        order: 1;
+        /* 排序第一 */
+        flex-basis: 100%;
+        /* Flex 换行基础 */
+    }
+
+    /* 导航和工具放到第二行 */
+    .nav-controls {
+        order: 2;
+        /* 排序第二 */
+        flex-grow: 1;
+        /* 占据剩余空间（如果有剩余的话） */
+        width: auto;
+        justify-content: flex-start;
+        padding-bottom: 0;
+        /* 移除 Grid 布局时的 padding */
+    }
+
+    /* 桌面端按钮也在移动端显示（如果需要隐藏可添加 display:none） */
+    .app-header>.icon-btn {
+        order: 3;
+        /* 排序第三 */
+        /* 如果需要可以微调样式 */
+    }
+
+    /* 移动端菜单按钮显示 */
+    #mobileMenuBtn {
+        display: flex;
+        margin-right: 4px;
+        position: static;
+    }
+
+    .sidebar {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 80;
+        transform: translateX(-100%);
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebar.show-mobile {
+        transform: translateX(0);
+    }
+
+    /* 移动端详情面板 - 底部抽屉样式 */
+    .details-pane {
+        display: none;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: auto;
+        height: 60vh;
+        width: 100%;
+        border-left: none;
+        border-top: 1px solid var(--border-color);
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+        z-index: 60;
+        border-radius: 12px 12px 0 0;
+        transform: translateY(100%);
+        transition: transform 0.3s cubic-bezier(0.1, 0.7, 0.1, 1);
+
+        /* 毛玻璃效果 */
+        background: var(--mobile-blur-bg);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-top: 1px solid var(--mobile-blur-border);
+    }
+
+    .details-pane.active {
+        display: flex !important;
+        transform: translateY(0);
+    }
+
+    /* 移动端拖拽把手(是否显示) */
+    #dragHandleDesk_details {
+        display: none;
+    }
+
+    .preview-box {
+        display: none;
+    }
+
+    /* 移动端顶部横条把手 */
+    .drag-handle-horizontal {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: grab;
+        z-index: 50;
+    }
+
+    .drag-handle-horizontal::after {
+        content: '';
+        width: 40px;
+        height: 4px;
+        background-color: var(--divider-color);
+        border-radius: 2px;
+    }
+
+    .grid-header {
+        display: none;
+    }
+
+    .file-row {
+        user-select: none;
+    }
+
+    #fileList:not(.view-grid) .file-row {
+        display: grid;
+        grid-template-columns: 40px 1fr;
+        height: 56px;
+        padding: 0 12px;
+    }
+
+    #fileList:not(.view-grid) .cell-meta,
+    #fileList:not(.view-grid) .cell-type {
+        display: none;
+    }
+
+    #fileList:not(.view-grid) .cell-name {
+        width: auto;
+        font-size: 15px;
+    }
+
+    .viewer-text {
+        width: 95%;
+        height: 95%;
+    }
+}
+
+/* --- 清除按钮：文字飞走特效 --- */
+.input-animating {
+    color: transparent !important;
+    /* 隐藏光标和可能残留的文字 */
+}
+
+.input-animating::placeholder {
+    opacity: 0 !important;
+    /* 关键：隐藏“输入路径或搜索...” */
+    visibility: hidden;
+}
+
+/* 1. 临时覆盖层 */
+.flying-text-overlay {
+    position: fixed;
+    /* 固定定位，确保位置准确 */
+    pointer-events: none;
+    /* 让鼠标穿透，不影响底层交互 */
+    z-index: 99;
+    white-space: pre;
+    /* 保留空格 */
+    overflow: hidden;
+    /* 防止飞出太远遮挡其他元素 */
+    display: flex;
+    align-items: center;
+    /* 垂直居中 */
+}
+
+/* 2. 单个文字的飞走动画 */
+.flying-char {
+    display: inline-block;
+    opacity: 1;
+    /* 贝塞尔曲线：先慢后快，模拟飞出 */
+    animation: flyAway 0.6s cubic-bezier(0.5, 0, 1, 1) forwards;
+}
+
+/* 3. 关键帧：向上飘 + 透明 + 轻微旋转 */
+@keyframes flyAway {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+        filter: blur(0);
+    }
+
+    100% {
+        transform: translateY(-40px) rotate(10deg);
+        /* 向上飞 40px */
+        opacity: 0;
+        filter: blur(2px);
+        /* 飞走时变模糊 */
+    }
+}
+
+
+/* 用于 JS 动态添加的类 */
+.anim-rotate {
+    /* 0.5s 完成旋转，ease-in-out 让开始和结束时速度稍慢，更有质感 */
+    animation: spin-360 0.5s ease-in-out;
+}
+
+.anim-entry {
+    animation: listEntry 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    opacity: 0;
+    /* 初始隐藏 */
+}
+
+
+/* <!-- ########## -->
+<!-- 动画效果 -->
+<!-- ########## --> */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes spin-360 {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes listEntry {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

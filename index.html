@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Everything Explorer Ultimate</title>
+    <link rel="stylesheet" href="../config/index.css">
+</head>
+
+<body>
+
+    <!-- ########## -->
+    <!-- 顶部导航栏 -->
+    <!-- ########## -->
+
+    <header class="app-header">
+        <!-- 地址栏和导航按钮 -->
+        <div class="address-container">
+            <svg width="18px" height="18px" fill="gray" viewBox="0 0 16 16" style="margin-right: 8px;">
+                <use href="#icon-adress"></use>
+            </svg>
+            <input type="text" id="addressInput" class="address-input" placeholder="输入路径或搜索..." autocomplete="off">
+            <div id="clearSearchBtn" class="clear-btn" title="清除内容">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <use href="#icon-clearSearchBtn"></use>
+                </svg>
+            </div>
+        </div>
+        <!-- 操作按钮 -->
+        <div class="nav-controls">
+            <!-- 移动菜单按钮 -->
+            <button id="mobileMenuBtn" class="icon-btn" onclick="app.toggleSidebar()">
+                <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                    <use href="#icon-mobileMenuBtn"></use>
+                </svg>
+            </button>
+            <!-- 后退按钮 -->
+            <button class="icon-btn" id="btnBack" onclick="app.goBack()" disabled title="后退">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <use href="#icon-btnBack"></use>
+                </svg>
+            </button>
+            <!-- 前进按钮 -->
+            <button class="icon-btn" id="btnForward" onclick="app.goForward()" disabled title="前进">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <use href="#icon-btnForward"></use>
+                </svg>
+            </button>
+            <!-- 上一级按钮 -->
+            <button class="icon-btn" id="btnGoUp" onclick="app.goUp()" title="向上级">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <use href="#icon-btnGoUp"></use>
+                </svg>
+            </button>
+            <!-- 刷新按钮 -->
+            <button class="icon-btn" id="btnRefresh" onclick="app.refresh()" title="刷新">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <use href="#icon-btnRefresh"></use>
+                </svg>
+            </button>
+
+            <!-- 移动端显示的额外菜单 -->
+            <button class="icon-btn" style="display:none;" id="mobileMoreBtn" onclick="app.toggleSettingsMenu(event)">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <use href="#icon-mobileMoreBtn"></use>
+                </svg>
+            </button>
+        </div>
+
+        <!-- 排序按钮 -->
+        <button class="icon-btn" onclick="app.sort('name')" title="排序">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <use href="#icon-sort"></use>
+            </svg>
+        </button>
+
+        <!-- 视图按钮 -->
+        <button class="icon-btn" onclick="app.toggleViewMenu(event)" title="视图布局">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <use href="#icon-view"></use>
+            </svg>
+        </button>
+
+        <!-- 主题切换按钮 -->
+        <button class="icon-btn" onclick="app.toggleTheme()" title="切换主题">
+            <span id="themeToggleIcon">☀</span>
+        </button>
+
+        <!-- 更多选项按钮 -->
+        <button class="icon-btn" onclick="app.toggleSettingsMenu(event)" title="更多选项">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <use href="#icon-settings"></use>
+            </svg>
+        </button>
+    </header>
+
+    <!-- 视图切换菜单 -->
+    <div id="viewMenu" class="flyout-menu">
+        <div class="menu-item" onclick="app.setView('grid')">
+            <span class="menu-icon">⊞</span> <span class="menu-label">大图标 (Grid)</span> <span class="menu-check"
+                id="checkGrid">✓</span>
+        </div>
+        <div class="menu-item" onclick="app.setView('list')">
+            <span class="menu-icon">≣</span> <span class="menu-label">详细信息 (List)</span> <span class="menu-check"
+                id="checkList">✓</span>
+        </div>
+    </div>
+
+    <!-- 设置菜单 -->
+    <div id="settingsMenu" class="flyout-menu">
+        <div class="menu-item" id="optShowHidden" onclick="app.toggleHidden()">
+            <span class="menu-label">显示隐藏文件</span>
+            <div class="toggle-switch"></div>
+        </div>
+        <div class="menu-item" id="optCopyInfo" onclick="app.toggleCopyInfo()">
+            <span class="menu-label">点击内容复制</span>
+            <div class="toggle-switch"></div>
+        </div>
+        <div class="menu-separator"></div>
+        <div style="padding:4px 12px; font-size:12px; color:var(--text-secondary)">打开方式</div>
+        <div class="menu-item" onclick="app.setOpenMethod('overlay')">
+            <span class="menu-label">本页预览</span> <span class="menu-check" id="checkOverlay">✓</span>
+        </div>
+        <div class="menu-item" onclick="app.setOpenMethod('newWindow')">
+            <span class="menu-label">新窗口打开</span> <span class="menu-check" id="checkNewWin">✓</span>
+        </div>
+    </div>
+
+    <div class="layout-container">
+
+        <!-- ########## -->
+        <!-- 左侧：侧边栏 -->
+        <!-- ########## -->
+        <aside class="sidebar" id="sidebar">
+            <!-- 快速访问 -->
+            <div class="sidebar-group-title"><span>📌 快速访问</span></div>
+            <div class="sidebar-item" id="defaultNav" onclick="app.navigateTo(app.config.defaultPath)">
+                <span class="file-icon" style="font-size:16px">📂</span> 共享目录
+            </div>
+            <!-- 此电脑 -->
+            <div class="sidebar-group-title">
+                <div class="tree-toggle" onclick="app.toggleTree(this)">▼</div>
+                <span onclick="app.navigateTo('')" style="cursor:pointer">🖥️ 此电脑</span>
+            </div>
+            <div class="tree-children open" id="driveList">
+                <div style="padding:4px 12px; color:var(--text-secondary); font-size:12px">加载中...</div>
+            </div>
+            <!-- 收藏 -->
+            <div class="sidebar-group-title"><span>❤️ 收藏</span></div>
+            <div id="favList">
+                <div style="padding:4px 12px; color:var(--text-secondary); font-size:12px">暂无收藏文件</div>
+            </div>
+        </aside>
+        <!-- 遮罩层 -->
+
+        <div class="sidebar-mask" onclick="app.toggleSidebar()"></div>
+        <!-- ########## -->
+        <!-- 主体：文件夹列表 -->
+        <!-- ########## -->
+
+        <main class="file-pane" id="filePane">
+            <div class="grid-header" id="colHeader"></div>
+            <div id="fileList" onclick="app.bgClick(event)"></div>
+        </main>
+
+        <!-- ########## -->
+        <!-- 右侧：详情面板 -->
+        <!-- ########## -->
+
+        <aside id="detailsPane" class="details-pane">
+            <!-- PC端垂直拖动 -->
+            <div class="drag-handle-vertical" id="dragHandleDesk_detail"></div>
+            <!-- 移动端水平拖动 -->
+            <div class="drag-handle-horizontal" id="dragHandleMobile_detail"></div>
+            <!-- 预览框/ -->
+            <div class="preview-box" style="gap: 8px;" id="previewBox"></div>
+            <div class="preview-row">
+                <div class="preview-icon" id="detailIcon"></div>
+                <div class="large-name" id="detailName">Filename</div>
+            </div>
+            <!-- 按钮组 -->
+            <div class="btn-group">
+                <!-- 预览按钮 -->
+                <button class="action-btn primary" id="btnPreview">
+                    预览
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <use href="#icon-preview"></use>
+                    </svg>
+                </button>
+                <!-- 下载按钮 -->
+                <button class="action-btn" id="btnDownload" title="下载">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <use href="#icon-download"></use>
+                    </svg>
+                </button>
+                <!-- 收藏按钮 -->
+                <button class="action-btn" id="detailFavBtn" title="收藏" onclick="app.toggleFavoriteFromDetail()"
+                    style="flex:0 0 36px;">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <use href="#icon-favorite"></use>
+                    </svg>
+                </button>
+                <!-- 关闭详情按钮 -->
+                <button class="action-btn" onclick="app.closeDetails()" title="关闭详情" style="flex:0 0 36px;">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <use href="#icon-close-detail"></use>
+                    </svg>
+                </button>
+            </div>
+            <!-- 详情信息 -->
+            <div class="info-group">
+                <div class="info-label">位置 (Location)</div>
+                <div class="info-value" id="detailLocation"></div>
+            </div>
+            <div class="info-group">
+                <div class="info-label">完整路径 (Full Path)</div>
+                <div class="info-value" id="detailPath"></div>
+            </div>
+            <div class="info-group">
+                <div class="info-label">类型(Type)</div>
+                <div class="info-value" id="detailType"></div>
+            </div>
+            <div class="info-group">
+                <div class="info-label">修改日期(Modified Date)</div>
+                <div class="info-value" id="detailDate"></div>
+            </div>
+            <div class="info-group">
+                <div class="info-label">大小(Size)</div>
+                <div class="info-value" id="detailSize"></div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- ########## -->
+    <!-- 底部：任务栏和状态栏 -->
+    <!-- ########## -->
+
+    <!-- 任务栏 -->
+    <div class="task-bar" id="taskBar" style="display: none;"></div>
+    <!-- 底部状态栏（含跳转） -->
+    <footer class="status-bar">
+        <div id="statusLeft">就绪</div>
+        <div class="pagination-controls">
+            <button class="icon-btn" onclick="app.jumpToPage(1)" style="width:24px;height:24px;"
+                title="首页">&lt;&lt;</button>
+            <button class="icon-btn" onclick="app.prevPage()" style="width:24px;height:24px;" title="上一页">&lt;</button>
+            <span>第</span>
+            <input type="number" id="pageInput" class="page-input" value="1" min="1"
+                onchange="app.jumpToPage(this.value)">
+            <span id="totalPages">/ 1 页</span>
+            <button class="icon-btn" onclick="app.nextPage()" style="width:24px;height:24px;" title="下一页">&gt;</button>
+            <button class="icon-btn" onclick="app.jumpToPage(-1)" style="width:24px;height:24px;"
+                title="尾页">&gt;&gt;</button>
+        </div>
+    </footer>
+
+    <!-- ########## -->
+    <!-- 查看框 -->
+    <!-- ########## -->
+
+    <div id="viewerModal" class="viewer-modal">
+        <!-- 查看框顶部 -->
+        <div class="viewer-toolbar">
+            <span class="viewer-title" id="viewerTitle">Preview</span>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <!-- 加载字幕按钮 (默认隐藏，视频时显示) -->
+                <button id="viewerSubBtn" class="icon-btn" style="cursor:pointer; display:none;"
+                    onclick="app.triggerSubtitleLoad()" title="加载字幕">
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <use href="#icon-subtitle"></use>
+                    </svg>
+                </button>
+                <!-- 隐藏的文件选择器，用于字幕加载 -->
+                <input type="file" id="subtitleInput" style="display: none;" accept=".vtt,.srt,.ass,.ssa,.lrc">
+                <!-- 收藏按钮 -->
+                <button id="viewerFavBtn" class="icon-btn" style="cursor:pointer;" onclick="app.toggleFavoriteCurrent()"
+                    title="收藏">
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <use href="#icon-favorite"></use>
+                    </svg>
+                </button>
+                <!-- 新窗口打开按钮 -->
+                <a id="viewerOpenBtn" class="icon-btn" style="cursor:pointer;" href="#" target="_blank" title="在新窗口打开">
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <use href="#icon-new-tab"></use>
+                    </svg>
+                </a>
+                <!-- 下载按钮 -->
+                <a id="viewerDownloadBtn" class="icon-btn" style="cursor:pointer;" href="#" target="_blank" download
+                    title="下载">
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <use href="#icon-download"></use>
+                    </svg>
+                </a>
+                <!-- 最小化 -->
+                <button onclick="app.minimizeViewer()" class="icon-btn" style="cursor:pointer;" title="最小化">
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <use href="#icon-minimize"></use>
+                    </svg>
+                </button>
+                <!-- 关闭按钮 -->
+                <button onclick="app.closeFile(app.state.activeFileIndex)" class="icon-btn" style="cursor:pointer;"
+                    title="关闭">
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <use href="#icon-close"></use>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <!-- 查看框主体 -->
+        <div class="viewer-content" id="viewerContent"></div>
+    </div>
+    <!-- 复制提示框 -->
+    <div id="copyToast" class="toast">已复制内容</div>
+
+</body>
+
+</html>
+
+
+<!-- ########## -->
+<!-- 图标定义 -->
+<!-- ########## -->
+
+<!-- 图标定义1 -->
+<svg width="0" height="0" style="position: absolute; visibility: hidden;">
+    <defs>
+        <!-- 地址 -->
+        <symbol id="icon-adress" viewBox="0 0 16 16">
+            <path
+                d="M12.433 10.07C14.133 10.585 16 11.15 16 8a8 8 0 1 0-8 8c1.996 0 1.826-1.504 1.649-3.08-.124-1.101-.252-2.237.351-2.92.465-.527 1.42-.237 2.433.07zM8 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm4.5 3a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0z" />
+        </symbol>
+
+        <!-- 清除文本 -->
+        <symbol id="icon-clearSearchBtn" viewBox="0 0 1050 1024">
+            <path
+                d="M1024 1024H26.25641a26.25641 26.25641 0 1 1 0-52.512821h997.74359a26.25641 26.25641 0 0 1 0 52.512821zM630.153846 887.466667l-21.005128 31.507692H262.564103l-180.434052-155.017846L36.758974 729.928205l31.507693-42.010256L503.020308 12.077949l36.023795-8.086975L966.235897 288.820513l45.42359 30.299897-30.877538 42.482872zM532.795077 63.015385l-422.203077 656.410256L262.564103 867.774359V866.461538h318.542769l355.98441-534.002871z"
+                fill="#484D55"></path>
+            <path d="M525.128205 26.25641l472.615385 262.564103-210.051282 315.076923-472.615385-262.564103z"
+                fill="#484D55">
+            </path>
+        </symbol>
+
+        <!-- 侧边栏 -->
+        <symbol id="icon-mobileMenuBtn" viewBox="0 0 1050 1024">
+            <path
+                d="M68.608 912.018286c-28.452571 0-51.492571 21.504-51.492571 47.981714 0 26.477714 23.04 47.981714 51.492571 47.981714h959.926857c28.452571 0 51.492571-21.504 51.492572-47.981714 0-26.477714-23.04-47.981714-51.492572-47.981714z m835.657143-595.529143c-18.797714-18.724571-50.249143-17.627429-70.363429 2.413714-20.041143 20.114286-21.138286 51.565714-2.413714 70.290286l121.270857 121.270857-129.901714 129.828571c-20.114286 20.114286-21.211429 51.565714-2.413714 70.363429 18.724571 18.724571 50.176 17.627429 70.217142-2.486857l202.678858-202.605714zM68.608 464.018286c-28.452571 0-51.492571 21.504-51.492571 47.981714 0 26.477714 23.04 47.981714 51.492571 47.981714h582.802286c28.452571 0 51.419429-21.504 51.419428-47.981714 0-26.477714-22.966857-47.981714-51.419428-47.981714z m0-448C40.082286 16.018286 17.115429 37.522286 17.115429 64c0 26.477714 23.04 47.981714 51.492571 47.981714h959.926857c28.452571 0 51.492571-21.504 51.492572-47.981714 0-26.477714-23.04-47.981714-51.492572-47.981714z"
+                fill="#3AA5FF"></path>
+        </symbol>
+
+        <!-- 后退 -->
+        <symbol id="icon-btnBack" viewBox="0 0 16 16">
+            <path fill-rule="evenodd"
+                d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
+        </symbol>
+
+        <!-- 前进 -->
+        <symbol id="icon-btnForward" viewBox="0 0 16 16">
+            <path fill-rule="evenodd"
+                d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z" />
+        </symbol>
+
+        <!-- 上一级 -->
+        <symbol id="icon-btnGoUp" viewBox="0 0 1024 1024">
+            <path
+                d="M904.4 839.6H552.5a125.1 125.1 0 0 1-124.2-125.1V242l208.8 204.3a42.3 42.3 0 0 0 31.5 12.6 41.4 41.4 0 0 0 31.5-12.6 45 45 0 0 0 0-63.9l-270-270a45 45 0 0 0-63 0l-270 274.5a45 45 0 0 0 0 63.9 45 45 0 0 0 63 0L338.3 260v454.5a215.1 215.1 0 0 0 214.2 215.1h351.9a45 45 0 0 0 45-45 45 45 0 0 0-45-45z" />
+        </symbol>
+
+        <!-- 刷新 -->
+        <symbol id="icon-btnRefresh" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
+            <path
+                d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z" />
+        </symbol>
+
+        <!-- 移动端显示的额外菜单 -->
+        <symbol id="icon-mobileMoreBtn" viewBox="0 0 16 16">
+            <path
+                d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+        </symbol>
+
+        <!-- 排序 -->
+        <symbol id="icon-sort" viewBox="0 0 16 16">
+            <path
+                d="M11.5 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L11 2.707V14.5a.5.5 0 0 0 .5.5zm-7-14a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L4 13.293V1.5a.5.5 0 0 1 .5-.5z" />
+        </symbol>
+
+        <!-- 视图 -->
+        <symbol id="icon-view" viewBox="0 0 16 16">
+            <path
+                d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z" />
+        </symbol>
+
+        <!-- 更多选项 -->
+        <symbol id="icon-settings" viewBox="0 0 16 16">
+            <path
+                d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+        </symbol>
+
+        <!-- 预览图标 -->
+        <symbol id="icon-preview" viewBox="0 0 16 16">
+            <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z" />
+            <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" />
+        </symbol>
+
+        <!-- 下载图标 -->
+        <symbol id="icon-download" viewBox="0 0 16 16">
+            <path
+                d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+            <path
+                d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
+        </symbol>
+
+        <!-- 字幕图标 -->
+        <symbol id="icon-subtitle" viewBox="0 0 16 16">
+            <path
+                d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z" />
+            <path
+                d="M5 8a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2A.5.5 0 0 1 5 8zm4 0a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2A.5.5 0 0 1 9 8z" />
+        </symbol>
+
+        <!-- 收藏图标 -->
+        <symbol id="icon-favorite" viewBox="0 0 16 16">
+            <path
+                d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
+        </symbol>
+
+        <!-- 关闭详情图标 -->
+        <symbol id="icon-close-detail" viewBox="0 0 16 16">
+            <path
+                d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+        </symbol>
+        <!-- 关闭图标 -->
+        <symbol id="icon-close" viewBox="0 0 1024 1024">
+            <path
+                d="M573.18272 512L883.860053 201.322667c16.213333-16.213333 16.213333-42.538667 0-58.752L881.47072 140.16a41.6 41.6 0 0 0-58.773333 0L512.020053 450.837333 201.34272 140.16a41.557333 41.557333 0 0 0-58.752 0L140.180053 142.570667a41.514667 41.514667 0 0 0 0 58.752L450.87872 512 140.180053 822.677333a41.514667 41.514667 0 0 0 0 58.752l2.389334 2.410667c16.213333 16.213333 42.538667 16.213333 58.752 0L512.020053 573.162667 822.697387 883.84a41.6 41.6 0 0 0 58.773333 0l2.389333-2.410667c16.213333-16.213333 16.213333-42.538667 0-58.752L573.18272 512z" />
+        </symbol>
+
+        <!-- 新窗口打开 -->
+        <symbol id="icon-new-tab" viewBox="0 0 16 16">
+            <path fill-rule="evenodd"
+                d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z" />
+            <path fill-rule="evenodd"
+                d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z" />
+        </symbol>
+
+        <!-- 最小化图标 -->
+        <symbol id="icon-minimize" viewBox="0 0 16 16">
+            <path d="M2.5 8a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z" />
+        </symbol>
+
+    </defs>
+</svg>
+
+<script>
+
+    // 图标定义2
+    const svg_disk = '<svg t="1768356836839" class="icon" style="display:inline-block;"  viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1677" width="20px" height="20px"><path d="M907.2 640.58L800.24 144.41c-1.92-8.92-9.81-15.28-18.93-15.28H239.8c-9.12 0-17.01 6.37-18.93 15.28L113.92 640.52c-0.37 1.7-0.5 3.45-0.4 5.19l13.4 233.38c0.59 10.25 9.07 18.25 19.33 18.25h730.13c10.31 0 18.81-8.08 19.34-18.38l11.9-233.32c0.08-1.69-0.06-3.39-0.42-5.06z m-76.42 192.76H191.96V645.11h638.81v188.23z m-2.3-254.25H544.39v-82.34c23.63-4.52 45.47-14.02 63.42-27.85 27.91-21.49 43.91-52.04 43.91-83.81s-16-62.31-43.91-83.81c-17.95-13.83-39.79-23.33-63.42-27.85v-80.31h200.88l83.21 385.97zM512.39 334.43c40.83 0 75.33 23.2 75.33 50.67s-34.5 50.67-75.33 50.67-75.33-23.2-75.33-50.67 34.5-50.67 75.33-50.67z m-236.55-141.3H480.4v80.31c-23.63 4.52-45.47 14.02-63.42 27.85-27.91 21.49-43.91 52.04-43.91 83.81s16 62.31 43.91 83.81c17.95 13.83 39.79 23.33 63.42 27.85v82.34H192.63l83.21-385.97z" fill="currentColor" p-id="1678"></path><path d="M693.49 707.23H329.93c-5.5 0-9.95 4.46-9.95 9.95v44.09c0 5.5 4.46 9.95 9.95 9.95h363.56c5.5 0 9.95-4.46 9.95-9.95v-44.09c0-5.49-4.45-9.95-9.95-9.95z" fill="#333333" p-id="1679"></path></svg>';
+    const svg_favorite_filled = '<svg width="18" height="18" fill="red" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/></svg>';
+    const svg_favorite_outline = '<svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/></svg>';
+    const svg_play = '<svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M10.804 8 5 4.633v6.734L10.804 8zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692z"/></svg>';
+    const svg_pause = '<svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z"/></svg>';
+    const svg_loop = '<svg width="20" height="20" viewBox="0 0 1024 1024" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M958.709 342.197v492.322c0 27.387-22.224 49.923-49.634 49.923L177.628 884.443c-27.41 0-49.635-22.249-49.635-49.635s22.224-49.634 49.635-49.634l681.812 0L859.44 388.099 235.564 388.099l68.229 69.367c19.472 19.274 19.624 52.514 0.334 71.97-9.707 9.79-22.485 14.685-35.263 14.685-12.627 0-25.254-4.797-34.93-14.373L79.996 377.369c-9.41-9.31-14.706-22.057-14.706-35.29s5.296-26.039 14.706-35.349l153.937-152.583c19.474-19.262 50.901-19.594 70.193-0.14 19.29 19.456 19.139 49.912-0.334 69.186l-68.229 65.638 673.511 0c57.412 0 79.635 25.98 79.635 53.366z"></path></svg>';
+    const svg_loop_one = '<svg width="20" height="20" viewBox="0 0 1024 1024" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M439.977 51.413a42.667 42.667 0 0 0 1.963 60.288l17.365 16.299H384.425a384 384 0 0 0-103.424 753.92l-0.981-0.555a42.667 42.667 0 0 0 18.347 1.366l0.725 0.085v-0.17a42.667 42.667 0 0 0 0-84.267v-0.085A298.667 298.667 0 0 1 384.425 213.333h82.347l-26.027 24.832a42.667 42.667 0 0 0 59.008 61.696l99.925-95.573a42.667 42.667 0 0 0-0.298-61.952L500.265 49.493a42.667 42.667 0 0 0-60.288 1.963zM558.719 896l23.978 22.912a42.667 42.667 0 1 1-58.965 61.696l-99.925-95.573a42.667 42.667 0 0 1 0.298-61.952l99.115-92.886a42.667 42.667 0 0 1 58.325 62.294l-19.413 18.176H640.425a298.667 298.667 0 0 0 85.76-584.832 42.667 42.667 0 1 1 13.526-84.267l2.005-0.085A384 384 0 0 1 640.425 896h-81.706z"></path><path d="M612.692 670.72h-200.533v-61.44h67.413v-180.48H421.12v-46.933c34.133-6.4 56.32-14.933 78.507-28.587h55.893v256h57.173v61.44z"></path></svg>';
+    const svg_fullscreen = '<svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" ><path d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1h-4zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zM.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5z"/></svg>';
+    const svg_close = '<svg width="20" height="20" viewBox="0 0 1024 1024" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M954.304 190.336a15.552 15.552 0 0 1 0 21.952l-300.032 300.032 298.56 298.56a15.616 15.616 0 0 1 0 22.016l-120.96 120.896a15.552 15.552 0 0 1-21.952 0L511.36 655.232 214.272 952.32a15.552 15.552 0 0 1-21.952 0l-120.896-120.896a15.488 15.488 0 0 1 0-21.952l297.152-297.152L69.888 213.76a15.552 15.552 0 0 1 0-21.952l120.896-120.896a15.552 15.552 0 0 1 21.952 0L511.36 369.472l300.096-300.032a15.36 15.36 0 0 1 21.952 0l120.896 120.896z"></path></svg>';
+
+</script>
+
+
+<!-- ########## -->
+<!-- js引入 -->
+<!-- ########## -->
+
+<!-- 引入 jsmediatags 用于解析音频标签 -->
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script> -->
+<script src="../config/jsmediatags.min.js"></script>
+<script src="../config/index.js"></script>
