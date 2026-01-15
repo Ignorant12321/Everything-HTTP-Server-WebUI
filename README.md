@@ -25,7 +25,7 @@ const app = {
 ![alt text](.assest/image-5.png)
 ![alt text](.assest/image.png)
 4. 查找本机IP
-获取ip的方式如下，打开命令行终端，输入ipconfig，即可获取ipv4地址的
+获取ip的方式如下，打开命令行终端，输入ipconfig，即可获取ipv4地址
 ![alt text](.assest/image-3.png)
 ![alt text](.assest/image-1.png)
 5. 成功
