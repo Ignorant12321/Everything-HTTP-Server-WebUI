@@ -967,27 +967,28 @@ svg,
 .viewer-modal.music-mode {
     background: transparent !important;
     backdrop-filter: none;
-    /* 音乐模式下，让模态框背景穿透点击，但内容区域（播放器）可点击 */
     pointer-events: none !important;
-}
-
-.file-container {
-    pointer-events: none !important;
-}
-
-.viewer-content {
-    pointer-events: none !important;
-}
-
-/* 确保位于其中的“音频播放器本体”是可以点击的 */
-.viewer-modal.music-mode .audio-player-container {
-    pointer-events: auto !important;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
 }
 
 .viewer-modal.music-mode .viewer-content,
-.viewer-modal.music-mode .viewer-toolbar {
+.viewer-modal.music-mode .file-container {
+    pointer-events: none !important;
+}
+
+.viewer-modal.music-mode .viewer-content,
+.viewer-modal.music-mode .viewer-toolbar,
+.viewer-modal.music-mode .audio-player-container  {
     pointer-events: auto;
+}
+
+/* 4. 钉住时，只允许白名单内的控件响应 (按钮、进度条等) */
+.audio-player-container.pinned button,
+.audio-player-container.pinned .icon-btn,
+.audio-player-container.pinned .audio-progress-container,
+.audio-player-container.pinned .volume-wrapper,
+.audio-player-container.pinned .lyric-line {
+    pointer-events: auto !important;
+    cursor: pointer;
 }
 
 /* 4. 工具栏：透明磨砂 & 颜色自适应 */
