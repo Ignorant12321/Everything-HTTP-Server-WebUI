@@ -1,5 +1,12 @@
 import assert from 'node:assert/strict';
-import { loadAppConfig, DEFAULT_CONFIG } from '../config/js/config.js';
+import fs from 'node:fs';
+import vm from 'node:vm';
+
+const configSource = fs.readFileSync(new URL('../config/js/config.js', import.meta.url), 'utf8');
+const { loadAppConfig, DEFAULT_CONFIG } = vm.runInNewContext(
+  `${configSource};({ loadAppConfig, DEFAULT_CONFIG });`,
+  { console, URL },
+);
 
 const okFetch = async () => ({
   ok: true,

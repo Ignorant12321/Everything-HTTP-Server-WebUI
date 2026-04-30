@@ -1,10 +1,6 @@
 // 文件列表模块：渲染表头、列表、网格视图和选中态。
 
-import { svg_disk, svg_favorite_filled, svg_favorite_outline, svg_play, svg_pause, svg_loop_none, svg_loop_single, svg_loop_list, svg_shuffle_list, svg_fullscreen, svg_close, svg_volume, svg_volume_mute } from './icons.js';
-
-
-
-export function attachRenderListMethods(app) {
+function attachRenderListMethods(app) {
 
   app.renderHeader = function renderHeader() {
         this.dom.header.innerHTML = '';
@@ -58,9 +54,7 @@ export function attachRenderListMethods(app) {
         };
         document.addEventListener('mousemove', onMove);
         document.addEventListener('mouseup', onUp);
-    },
-
-    // --- 核心导航逻辑 ---;
+  };
 
   app.renderList = function renderList() {
         const list = this.dom.list;
@@ -78,7 +72,6 @@ export function attachRenderListMethods(app) {
 
             const div = document.createElement('div');
             div.className = 'file-row anim-entry'; // 添加 anim-entry 类
-            // 核心优化：根据 index 设置延迟，最大延迟 0.2s 避免太慢
             div.style.animationDelay = `${Math.min(index * 0.03, 0.2)}s`;
             if (this.state.selectedItem === item) div.classList.add('selected');
 
@@ -88,49 +81,37 @@ export function attachRenderListMethods(app) {
                 this.renderDetails(item);
                 targetEl = div;
             }
-            // 核心交互逻辑更新
             let longPressTimer;
             const startLongPress = () => {
                 longPressTimer = setTimeout(() => {
-                    // 长按逻辑：显示详情
                     this.selectItem(index);
                     this.dom.details.classList.add('active'); // 强制呼出详情
-                    // 可能需要震动反馈 navigator.vibrate(50)
                 }, 500);
             };
             const clearLongPress = () => {
                 if (longPressTimer) clearTimeout(longPressTimer);
             };
 
-            // 绑定触摸事件
             div.addEventListener('touchstart', (e) => {
-                // 不阻止默认，否则无法滚动
                 startLongPress();
             }, { passive: true });
 
             div.addEventListener('touchend', clearLongPress);
             div.addEventListener('touchmove', clearLongPress);
 
-
             div.onclick = (e) => {
                 e.stopPropagation();
 
                 if (window.innerWidth <= 768) {
-                    // 移动端逻辑
                     if (isDir) {
-                        // 单击文件夹：打开
                         const next = item.path ? `${item.path}\\${item.name}` : item.name;
                         this.navigateTo(next, true);
                     } else {
-                        // 单击文件：仅选中，不操作，不自动弹出详情（长按才弹出）
                         this.selectItem(index);
                     }
                 } else {
-                    // PC端逻辑 (保持原样: 单击选中+详情)
                     this.selectItem(index);
-                    // PC端详情面板是常驻或跟随的，不需要特殊 toggle
                     if (this.state.viewMode === 'list') {
-                        // this.dom.details.classList.add('active');
                     }
                 }
             };

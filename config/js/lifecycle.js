@@ -1,8 +1,6 @@
 // 生命周期模块：初始化主题、菜单、事件和默认路径。
 
-
-
-export function attachLifecycleMethods(app) {
+function attachLifecycleMethods(app) {
 
   app.init = function init() {
         this.applyTheme();          // 应用主题样式（亮色/深色主题）
@@ -14,16 +12,13 @@ export function attachLifecycleMethods(app) {
         this.initSidebarSwipe();    // 初始化侧边栏滑动功能（如侧边栏的左滑关闭）
         this.initSubtitleHandler(); // 初始化字幕处理逻辑（用于视频字幕加载）
 
-        // 绑定回车搜索
         this.dom.address.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') this.navigateTo(this.dom.address.value.trim());
         });
 
-        // 绑定清除按钮
         this.dom.clearBtn.addEventListener('click', () => {
             this.animateClear();
         });
-
 
         document.getElementById('btnPreview').addEventListener('click', () => {
             if (this.state.selectedItem) this.handleOpenAction(this.state.selectedItem);
@@ -32,7 +27,6 @@ export function attachLifecycleMethods(app) {
             if (this.state.selectedItem) this.triggerDownload(this.state.selectedItem);
         });
 
-        // 点击外部关闭菜单
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.flyout-menu') && !e.target.closest('.icon-btn')) {
                 this.dom.viewMenu.classList.remove('show');
@@ -45,7 +39,6 @@ export function attachLifecycleMethods(app) {
             }
         });
 
-        // 默认加载路径
         this.navigateTo(this.config.defaultPath);
     };
 

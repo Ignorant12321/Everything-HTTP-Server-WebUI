@@ -1,5 +1,5 @@
 // DOM 模块：集中查询页面节点，减少重复选择器和拼写错误。
-export function queryDom() {
+function queryDom() {
   return {
         address: document.getElementById('addressInput'),       // 地址栏输入框
         list: document.getElementById('fileList'),             // 文件列表容器
@@ -28,7 +28,6 @@ export function queryDom() {
         toast: document.getElementById('copyToast'),           // 复制成功提示框
         taskBar: document.getElementById('taskBar'),           // 任务栏容器
         clearBtn: document.getElementById('clearSearchBtn'),    // 搜索/地址栏清除按钮
-    },
+  };
 
-    // 初始化应用核心UI和功能（启动时执行）;
 }

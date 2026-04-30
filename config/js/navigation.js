@@ -1,8 +1,6 @@
 // 导航模块：维护路径、历史记录、分页和排序。
 
-
-
-export function attachNavigationMethods(app) {
+function attachNavigationMethods(app) {
 
   app.navigateTo = function navigateTo(path, isExplicitFolder = false) {
         path = path ? path.replace(/^"|"$/g, '').trim() : '';
@@ -69,12 +67,7 @@ export function attachNavigationMethods(app) {
             btnRefresh.classList.remove('anim-rotate');
         }, 500);
         this.fetchData();
-    },
-
-    /* 异步加载系统驱动器/磁盘列表（核心功能：获取可访问的磁盘分区并渲染到侧边栏）*/
-    //   1. 非本地/Blob协议下，通过接口请求真实磁盘列表；
-    //   2. 本地/Blob协议（如本地调试）或请求失败时，渲染默认的C盘作为演示；
-    //   3. 渲染后的磁盘项支持点击跳转对应路径。;
+  };
 
   app.updatePagination = function updatePagination() {
         const { offset, count, total, items } = this.state;

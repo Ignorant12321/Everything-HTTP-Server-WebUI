@@ -1,5 +1,5 @@
 // 状态模块：创建一次应用运行期状态，避免散落的全局变量。
-export function createState() {
+function createState() {
   return {
         currentPath: '',               // 当前浏览的文件路径
         items: [],                     // 当前路径下的文件/文件夹列表数据
@@ -37,7 +37,6 @@ export function createState() {
         },
         favorites: JSON.parse(localStorage.getItem('favorites') || '[]'), // 收藏的文件/文件夹列表，本地存储持久化
         loopMode: 'none'               // 图片预览循环模式：none(无循环)/one(单张循环)
-    },
+  };
 
-    // DOM 元素缓存：提前获取页面核心元素，避免重复DOM查询，提升性能;
 }

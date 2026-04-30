@@ -1,6 +1,5 @@
 // 音频初始化：绑定播放器事件、封面、歌词和可视化。
-import { svg_disk, svg_favorite_filled, svg_favorite_outline, svg_play, svg_pause, svg_loop_none, svg_loop_single, svg_loop_list, svg_shuffle_list, svg_fullscreen, svg_close, svg_volume, svg_volume_mute } from './icons.js';
-export function attachAudioInitMethods(app) {
+function attachAudioInitMethods(app) {
   app.initAudioPlayer = async function initAudioPlayer(container, file) {
         const audio = container.querySelector('audio'), playBtn = document.getElementById(`playBtn-${file.uniqueId}`), progress = document.getElementById(`audioProgress-${file.uniqueId}`);
         const progressArea = document.getElementById(`audioProgressArea-${file.uniqueId}`), curTimeEl = document.getElementById(`curTime-${file.uniqueId}`), durTimeEl = document.getElementById(`durTime-${file.uniqueId}`);

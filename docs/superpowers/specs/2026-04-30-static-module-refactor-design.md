@@ -72,9 +72,9 @@ tools/
 
 ## JavaScript 设计
 
-使用浏览器原生 ES Module，不需要构建工具。`config/index.html` 通过 `<script type="module" src="./js/app.js"></script>` 启动应用。
+使用浏览器经典脚本顺序加载，不需要构建工具。Everything HTTP 会把 `.js` 返回为 `application/octet-stream`，浏览器会拒绝 ES Module，因此 `config/index.html` 通过多个 `<script defer src="./js/..."></script>` 按依赖顺序加载模块。
 
-`app.js` 负责组合模块并导出全局 `window.app`。这样现有 `onclick="app.xxx()"` 可以继续工作，降低第一次重构的风险。
+`app.js` 负责组合各模块暴露的 `attach...Methods(app)` 函数，并导出全局 `window.app`。这样现有 `onclick="app.xxx()"` 可以继续工作，降低第一次重构的风险。
 
 主要模块职责：
 
@@ -158,7 +158,7 @@ node tools/check-file-lines.js
 
 ## 风险与缓解
 
-ES Module 的加载路径是主要风险。缓解方式是使用相对 `config/index.html` 的 `./` 前缀，并在 `localhost:11080` 上实际加载验证。
+脚本加载顺序和浏览器缓存是主要风险。缓解方式是使用相对 `config/index.html` 的 `./` 前缀，给本地脚本引用追加版本查询串，并在 `localhost:11080` 上实际加载验证。
 
 `app-config.json` 的路径和 JSON 格式是主要配置风险。缓解方式是在 `config/js/config.js` 中提供内置默认值、错误提示，并在 README 中说明反斜杠需要写成 `\\`。
 

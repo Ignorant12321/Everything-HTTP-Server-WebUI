@@ -7,7 +7,7 @@ const htmlPath = path.join(ROOT, 'config', 'index.html');
 const html = fs.readFileSync(htmlPath, 'utf8');
 const refs = [...html.matchAll(/(?:href|src)="(\.\/[^"]+)"/g)].map((match) => match[1]);
 const missing = refs
-  .map((ref) => ({ ref, file: path.resolve(path.dirname(htmlPath), ref) }))
+  .map((ref) => ({ ref, file: path.resolve(path.dirname(htmlPath), ref.split('?')[0]) }))
   .filter((item) => !fs.existsSync(item.file));
 
 if (missing.length) {

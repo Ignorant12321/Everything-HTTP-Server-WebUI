@@ -4,7 +4,7 @@
 
 **Goal:** Refactor the static Everything HTTP Server WebUI under `config/` into focused files under 300 lines, while moving `defaultPath` into `config/app-config.json`.
 
-**Architecture:** Keep the app as a no-build static browser application. Use native ES modules under `config/js/`, split CSS by UI area under `config/css/`, keep `window.app` as the compatibility surface for existing inline handlers, and load user configuration from JSON.
+**Architecture:** Keep the app as a no-build static browser application. Use classic deferred scripts under `config/js/` because Everything HTTP serves `.js` as `application/octet-stream`, split CSS by UI area under `config/css/`, keep `window.app` as the compatibility surface for existing inline handlers, and load user configuration from JSON.
 
 **Tech Stack:** Plain HTML, CSS, browser ES modules, Everything HTTP JSON API, Node.js built-in tooling for structural checks.
 

@@ -1,10 +1,6 @@
 // 预览模块：打开文件、管理预览窗口、多任务和图片缩放。
 
-import { svg_disk, svg_favorite_filled, svg_favorite_outline, svg_play, svg_pause, svg_loop_none, svg_loop_single, svg_loop_list, svg_shuffle_list, svg_fullscreen, svg_close, svg_volume, svg_volume_mute } from './icons.js';
-
-
-
-export function attachViewerMethods(app) {
+function attachViewerMethods(app) {
 
   app.openOverlay = async function openOverlay(item) {
         const url = item.fakeUrl || this.getFileUrl(item);
@@ -37,13 +33,11 @@ export function attachViewerMethods(app) {
         const file = this.state.openFiles[index];
         const modal = this.dom.viewerModal;
         const contentContainer = this.dom.viewerContent;
-        // --- 音乐模式逻辑 ---
         if (file.type === 'audio') {
             modal.classList.add('music-mode');
         } else {
             modal.classList.remove('music-mode');
         }
-        // --- 视频类型显示字幕按钮 ---
         if (file.type === 'video') {
             this.dom.viewerSubBtn.style.display = 'flex';
         } else {
@@ -84,19 +78,12 @@ export function attachViewerMethods(app) {
                             </div>
                         `;
             } else if (file.type === 'audio') {
-                // --- 核心更新：构建增强型音频播放器 ---
                 newContainer.innerHTML = this.buildAudioPlayerHTML(file);
                 this.initAudioPlayer(newContainer, file);
 
             } else if (file.type === 'video') {
-                // HEVC 检测提示逻辑
                 let hevcWarning = '';
                 if (file.ext === 'mkv' || file.ext === 'mp4') {
-                    // hevcWarning = `<div style="padding:10px; color:#aaa; font-size:12px; text-align:center;">
-                    //         如果播放失败(只有声音无画面)，可能是 HEVC(H.265) 编码。
-                    //         Windows Edge/Chrome 默认不支持硬件解码 HEVC。
-                    //         建议使用 <a href="${file.url}" target="_blank" style="color:#4cc2ff">外部播放器</a> 或手机访问。
-                    //      </div>`;
                 }
 
                 newContainer.innerHTML = `
@@ -106,7 +93,6 @@ export function attachViewerMethods(app) {
         ${hevcWarning}
     </div>`;
 
-                // 尝试加载字幕
                 this.findAndLoadSubtitles(file, newContainer);
 
             } else if (file.type === 'txt') {
@@ -126,15 +112,11 @@ export function attachViewerMethods(app) {
                             </div>`;
             }
         } catch (e) { newContainer.innerHTML = `<div style="color:red">加载失败: ${e.message}</div>`; }
-    },
-
-    // --- 视频字幕加载逻辑 ---;
+  };
 
   app.minimizeViewer = function minimizeViewer() {
         this.dom.viewerModal.classList.add('minimized');
-    },
-
-    // 修改后的隐藏 Viewer 方法，不关闭文件，只隐藏界面;
+  };
 
   app.hideViewer = function hideViewer() {
         this.dom.viewerModal.classList.remove('open');
@@ -143,36 +125,29 @@ export function attachViewerMethods(app) {
     };
 
   app.closeViewer = function closeViewer() {
-        // 此方法保留给单个关闭逻辑如果需要，但右上角X现在使用 hideViewer
         this.hideViewer();
-    },
-
-    // --- 修改 closeFile ---;
+  };
 
   app.closeFile = function closeFile(index, e) {
         if (e) e.stopPropagation();
 
         const fileToRemove = this.state.openFiles[index];
 
-        // 停止音频播放并清理 Web Audio Context
         if (fileToRemove._audioContext) {
             if (fileToRemove._audioContext.audio) {
                 fileToRemove._audioContext.audio.pause();
                 fileToRemove._audioContext.audio.src = "";
             }
-            // 调用我们刚才定义的清理函数
             if (fileToRemove._audioContext.close) {
                 fileToRemove._audioContext.close();
             }
         }
 
-        // ... 原有的 UI 清理代码 ...
         const containerToRemove = document.getElementById(fileToRemove.uniqueId);
         if (containerToRemove) containerToRemove.remove();
 
         this.state.openFiles.splice(index, 1);
 
-        // ... 后续逻辑保持不变 ...
         if (this.state.openFiles.length > 0) {
             if (index === this.state.activeFileIndex) {
                 const newIndex = Math.max(0, index - 1);

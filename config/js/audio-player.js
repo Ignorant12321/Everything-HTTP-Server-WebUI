@@ -1,10 +1,6 @@
 // 音频播放器模块：生成播放器、切歌、循环和固定窗口。
 
-import { svg_disk, svg_favorite_filled, svg_favorite_outline, svg_play, svg_pause, svg_loop_none, svg_loop_single, svg_loop_list, svg_shuffle_list, svg_fullscreen, svg_close, svg_volume, svg_volume_mute } from './icons.js';
-
-
-
-export function attachAudioMethods(app) {
+function attachAudioMethods(app) {
 
   app.buildAudioPlayerHTML = function buildAudioPlayerHTML(file) {
         const volumeHtml = `
@@ -60,42 +56,31 @@ export function attachAudioMethods(app) {
         </div>
         <audio id="audioEl-${file.uniqueId}" src="${file.url}" crossorigin="anonymous" style="display:none"></audio>
         `;
-    },
-
-    // --- 在 app 对象中替换此方法 ---
-    // --- 修改 initAudioPlayer ---;
+  };
 
   app.playNextInFavorites = function playNextInFavorites(currentFile, isShuffle) {
-        // 1. 获取所有收藏项
         const allFavs = this.state.favorites;
         if (!allFavs || allFavs.length === 0) return;
 
-        // 2. 过滤出音频文件 (排除文件夹、图片等)
-        // 简单判断：扩展名在 audio 列表里
         const audioFavs = allFavs.filter(f => {
             if (f.isFolder) return false;
-            // url 可能是 /path/to/song.mp3，提取后缀
             const ext = f.url.split('.').pop().toLowerCase();
             return this.getFileType(ext) === 'audio';
         });
 
         if (audioFavs.length === 0) return;
 
-        // 3. 找到当前歌曲在列表中的位置
-        // 此时比较的是 url
         const currentIndex = audioFavs.findIndex(f => f.url === currentFile.url);
 
         let nextIndex = 0;
 
         if (isShuffle) {
-            // 随机模式：随机取一个下标 (尽量不重复播放当前这首，除非只有一首)
             if (audioFavs.length > 1) {
                 do {
                     nextIndex = Math.floor(Math.random() * audioFavs.length);
                 } while (nextIndex === currentIndex);
             }
         } else {
-            // 列表循环模式：下一首，到底部回到顶部
             if (currentIndex !== -1) {
                 nextIndex = (currentIndex + 1) % audioFavs.length;
             }
@@ -103,24 +88,19 @@ export function attachAudioMethods(app) {
 
         const nextFav = audioFavs[nextIndex];
 
-        // 4. 播放下一首
-        // 构造一个 item 对象传给 handleOpenAction
         const nextItem = {
             name: nextFav.name,
             fakeUrl: nextFav.url,
-            // 这里不需要 path，因为 fakeUrl 已经有了
         };
 
         this.showToast(isShuffle ? `随机播放: ${nextItem.name}` : `播放下一首: ${nextItem.name}`);
 
-        // 调用打开逻辑 (会替换当前预览或打开新文件)
         this.handleOpenAction(nextItem);
     };
 
   app.toggleLoop = function toggleLoop(uid) {
         const btn = document.getElementById(`loopBtn-${uid}`);
 
-        // 状态轮转: none -> list(收藏循环) -> shuffle(随机) -> one(单曲) -> none
         if (this.state.loopMode === 'none') {
             this.state.loopMode = 'list';
             this.showToast("模式: 收藏列表循环");
@@ -142,20 +122,16 @@ export function attachAudioMethods(app) {
         const btn = document.getElementById(`pinBtn-${uid}`);
         if (!container || !btn) return;
 
-        // 切换 class
         const isPinned = container.classList.toggle('pinned');
         this.state.isPinned = !this.state.isPinned;
 
-        // 更新图标和提示
         if (isPinned) {
-            // 锁定状态：实心图钉，提示“已锁定”
             btn.innerHTML = `<svg width="18" height="18" fill="currentColor"><use href="#icon-pin-on"></use></svg>`;
             btn.title = "解锁窗口 (允许拖动)";
             btn.style.opacity = "1";
             btn.style.color = "var(--accent-color)"; // 高亮显示
             this.showToast("窗口已固定，背景可穿透");
         } else {
-            // 解锁状态：空心图钉
             btn.innerHTML = `<svg width="18" height="18" fill="currentColor"><use href="#icon-pin-off"></use></svg>`;
             btn.title = "固定窗口 (鼠标穿透)";
             btn.style.opacity = "0.8";
@@ -166,7 +142,6 @@ export function attachAudioMethods(app) {
 
   app.updateLoopBtnUI = function updateLoopBtnUI(btn) {
         if (!btn) return;
-        // 根据状态设置图标和样式
         if (this.state.loopMode === 'one') {
             btn.innerHTML = svg_loop_single;
             btn.title = "单曲循环";

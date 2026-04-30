@@ -1,10 +1,6 @@
 // 详情模块：渲染属性面板、复制属性、下载和文件类型判断。
 
-import { svg_disk, svg_favorite_filled, svg_favorite_outline, svg_play, svg_pause, svg_loop_none, svg_loop_single, svg_loop_list, svg_shuffle_list, svg_fullscreen, svg_close, svg_volume, svg_volume_mute } from './icons.js';
-
-
-
-export function attachDetailsMethods(app) {
+function attachDetailsMethods(app) {
 
   app.renderDetails = function renderDetails(item) {
         const pane = this.dom.details;
@@ -13,9 +9,6 @@ export function attachDetailsMethods(app) {
         if (window.innerWidth > 768) {
             pane.classList.add('active');
         } else {
-            // 移动端保持原状，除非手动激活
-            // pane.classList.add('active');
-            // pane.style.transform = '';
         }
 
         const isDir = (!item.size && item.size !== 0);
@@ -45,7 +38,6 @@ export function attachDetailsMethods(app) {
 
         document.getElementById('detailName').textContent = item.name;
 
-        // 更新详情页心形图标状态
         const favBtn = document.getElementById('detailFavBtn');
         const isFav = this.state.favorites.some(f => f.url === fakeUrl);
         if (isFav) {
@@ -53,7 +45,6 @@ export function attachDetailsMethods(app) {
         } else {
             favBtn.innerHTML = svg_favorite_outline;
         }
-
 
         const renderValue = (id, val) => {
             const el = document.getElementById(id);
@@ -69,7 +60,6 @@ export function attachDetailsMethods(app) {
             }
         };
 
-        // 分离位置和完整路径
         const locationPath = item.path || 'Root';
         const fullPath = item.path ? `${item.path}\\${item.name}` : item.name;
 
@@ -89,7 +79,6 @@ export function attachDetailsMethods(app) {
     };
 
   app.copyText = function copyText(text) {
-        // 优先使用 Clipboard API
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(text).then(() => {
                 this.showToast('已复制内容');
@@ -102,7 +91,6 @@ export function attachDetailsMethods(app) {
     };
 
   app.fallbackCopyText = function fallbackCopyText(text) {
-        // 回退方案：创建隐藏输入框选中文本执行 copy 命令
         const textArea = document.createElement("textarea");
         textArea.value = text;
         textArea.style.position = "fixed";  // 避免滚动
@@ -142,9 +130,7 @@ export function attachDetailsMethods(app) {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-    },
-
-    // --- 预览窗口逻辑 ---;
+  };
 
   app.getFileType = function getFileType(ext) {
         const types = {

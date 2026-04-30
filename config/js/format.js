@@ -1,8 +1,6 @@
 // 格式化模块：统一处理大小、日期和时间文本。
 
-
-
-export function attachFormatMethods(app) {
+function attachFormatMethods(app) {
 
   app.formatSize = function formatSize(bytes) {
         if (bytes === undefined) return '';
