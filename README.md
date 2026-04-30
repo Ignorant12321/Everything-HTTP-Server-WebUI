@@ -6,20 +6,27 @@ Everything的HTTP服务器界面UI，支持文件预览/查看功能
 
 1. 下载
 Everything-HTTP-Server-WebUI压缩包并解压到指定位置，如：`D:\Data\Share\config`，注意文件目录结构：
-![alt text](.assest/image-2.png)
-2. 本地化
-更改文件内容：打开`index.js`文件，修改默认位置`defaultPath`对应的值，上下文如图：
 
-```js
-const app = {
-    config: {
-        // 默认路径 Defaulut Path
-        defaultPath: 'D:\\Data\\Share',
-    },
-
+```text
+config/
+  index.html
+  app-config.json
+  css/
+  js/
+  vendor/
 ```
 
-注意路径中的反斜杠需要转义，如 `D:\Data\Share\config` 需要更改为`D:\\Data\\Share`
+![alt text](.assest/image-2.png)
+2. 本地化
+打开 `config/app-config.json`，修改 `defaultPath`：
+
+```json
+{
+  "defaultPath": "D:\\Data\\Share"
+}
+```
+
+注意：JSON 字符串中的反斜杠需要写成 `\\`，例如 `D:\Data\Share` 应写为 `D:\\Data\\Share`。
 3. 配置
 打开Everything软件，并开启Everything的HTTP服务器。配置如下：
 ![alt text](.assest/image-5.png)
