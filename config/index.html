@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Everything Explorer Ultimate</title>
+    <link rel="stylesheet" href="./css/base.css">
+    <link rel="stylesheet" href="./css/layout.css">
+    <link rel="stylesheet" href="./css/header.css">
+    <link rel="stylesheet" href="./css/sidebar.css">
+    <link rel="stylesheet" href="./css/file-list.css">
+    <link rel="stylesheet" href="./css/details.css">
+    <link rel="stylesheet" href="./css/viewer.css">
+    <link rel="stylesheet" href="./css/audio-player.css">
+    <link rel="stylesheet" href="./css/audio-volume.css">
+    <link rel="stylesheet" href="./css/responsive-audio.css">
+    <link rel="stylesheet" href="./css/utilities.css">
+    <link rel="stylesheet" href="./css/responsive.css">
+    <script type="module" src="./js/svg-symbols.js"></script>
+    <script defer src="./vendor/jsmediatags.min.js"></script>
+    <script defer src="./index.js"></script>
+</head>
+<body>
+    <header class="app-header">
+        <div class="address-container">
+            <svg width="18px" height="18px" fill="gray" viewBox="0 0 16 16" style="margin-right: 8px;">
+                <use href="#icon-adress"></use>
+            </svg>
+            <input type="text" id="addressInput" class="address-input" placeholder="输入路径或搜索..." autocomplete="off">
+            <div id="clearSearchBtn" class="clear-btn" title="清除内容">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <use href="#icon-clearSearchBtn"></use>
+                </svg>
+            </div>
+        </div>
+        <div class="nav-controls">
+            <button id="mobileMenuBtn" class="icon-btn" onclick="app.toggleSidebar()">
+                <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                    <use href="#icon-mobileMenuBtn"></use>
+                </svg>
+            </button>
+            <button class="icon-btn" id="btnBack" onclick="app.goBack()" disabled title="后退">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <use href="#icon-btnBack"></use>
+                </svg>
+            </button>
+            <button class="icon-btn" id="btnForward" onclick="app.goForward()" disabled title="前进">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <use href="#icon-btnForward"></use>
+                </svg>
+            </button>
+            <button class="icon-btn" id="btnGoUp" onclick="app.goUp()" title="向上级">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <use href="#icon-btnGoUp"></use>
+                </svg>
+            </button>
+            <button class="icon-btn" id="btnRefresh" onclick="app.refresh()" title="刷新">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <use href="#icon-btnRefresh"></use>
+                </svg>
+            </button>
+            <button class="icon-btn" style="display:none;" id="mobileMoreBtn" onclick="app.toggleSettingsMenu(event)">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <use href="#icon-mobileMoreBtn"></use>
+                </svg>
+            </button>
+        </div>
+        <button class="icon-btn" onclick="app.sort('name')" title="排序">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <use href="#icon-sort"></use>
+            </svg>
+        </button>
+        <button class="icon-btn" onclick="app.toggleViewMenu(event)" title="视图布局">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <use href="#icon-view"></use>
+            </svg>
+        </button>
+        <button class="icon-btn" onclick="app.toggleTheme()" title="切换主题">
+            <span id="themeToggleIcon">☀</span>
+        </button>
+        <button class="icon-btn" onclick="app.toggleSettingsMenu(event)" title="更多选项">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <use href="#icon-settings"></use>
+            </svg>
+        </button>
+    </header>
+    <div id="viewMenu" class="flyout-menu">
+        <div class="menu-item" onclick="app.setView('grid')">
+            <span class="menu-icon">⊞</span> <span class="menu-label">大图标 (Grid)</span> <span class="menu-check"
+                id="checkGrid">✓</span>
+        </div>
+        <div class="menu-item" onclick="app.setView('list')">
+            <span class="menu-icon">≣</span> <span class="menu-label">详细信息 (List)</span> <span class="menu-check"
+                id="checkList">✓</span>
+        </div>
+    </div>
+    <div id="settingsMenu" class="flyout-menu">
+        <div class="menu-item" id="optShowHidden" onclick="app.toggleHidden()">
+            <span class="menu-label">显示隐藏文件</span>
+            <div class="toggle-switch"></div>
+        </div>
+        <div class="menu-item" id="optCopyInfo" onclick="app.toggleCopyInfo()">
+            <span class="menu-label">点击属性复制</span>
+            <div class="toggle-switch"></div>
+        </div>
+        <div class="menu-separator"></div>
+        <div style="padding:4px 12px; font-size:12px; color:var(--text-secondary)">打开方式</div>
+        <div class="menu-item" onclick="app.setOpenMethod('overlay')">
+            <span class="menu-label">本页预览</span> <span class="menu-check" id="checkOverlay">✓</span>
+        </div>
+        <div class="menu-item" onclick="app.setOpenMethod('newWindow')">
+            <span class="menu-label">新窗口打开</span> <span class="menu-check" id="checkNewWin">✓</span>
+        </div>
+    </div>
+    <div class="layout-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-group-title"><span>📌 快速访问</span></div>
+            <div class="sidebar-item" id="defaultNav" onclick="app.navigateTo(app.config.defaultPath)">
+                <span class="file-icon" style="font-size:16px">📂</span> 共享目录
+            </div>
+            <div class="sidebar-group-title">
+                <div class="tree-toggle" onclick="app.toggleTree(this)">▼</div>
+                <span onclick="app.navigateTo('')" style="cursor:pointer">🖥️ 此电脑</span>
+            </div>
+            <div class="tree-children open" id="driveList">
+                <div style="padding:4px 12px; color:var(--text-secondary); font-size:12px">加载中...</div>
+            </div>
+            <div class="sidebar-group-title"><span>❤️ 收藏</span></div>
+            <div id="favList">
+                <div style="padding:4px 12px; color:var(--text-secondary); font-size:12px">暂无收藏文件</div>
+            </div>
+        </aside>
+        <div class="sidebar-mask" onclick="app.toggleSidebar()"></div>
+        <main class="file-pane" id="filePane">
+            <div class="grid-header" id="colHeader"></div>
+            <div id="fileList" onclick="app.bgClick(event)"></div>
+        </main>
+        <aside id="detailsPane" class="details-pane">
+            <div class="drag-handle-vertical" id="dragHandleDesk_detail"></div>
+            <div class="drag-handle-horizontal" id="dragHandleMobile_detail"></div>
+            <div class="preview-box" style="gap: 8px;" id="previewBox"></div>
+            <div class="preview-row">
+                <div class="preview-icon" id="detailIcon"></div>
+                <div class="large-name" id="detailName">Filename</div>
+            </div>
+            <div class="btn-group">
+                <button class="action-btn primary" id="btnPreview">
+                    预览
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <use href="#icon-preview"></use>
+                    </svg>
+                </button>
+                <button class="action-btn" id="btnDownload" title="下载">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <use href="#icon-download"></use>
+                    </svg>
+                </button>
+                <button class="action-btn" id="detailFavBtn" title="收藏" onclick="app.toggleFavoriteFromDetail()"
+                    style="flex:0 0 36px;">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <use href="#icon-favorite"></use>
+                    </svg>
+                </button>
+                <button class="action-btn" onclick="app.closeDetails()" title="关闭详情" style="flex:0 0 36px;">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <use href="#icon-close-detail"></use>
+                    </svg>
+                </button>
+            </div>
+            <div class="info-group">
+                <div class="info-label">位置 (Location)</div>
+                <div class="info-value" id="detailLocation"></div>
+            </div>
+            <div class="info-group">
+                <div class="info-label">完整路径 (Full Path)</div>
+                <div class="info-value" id="detailPath"></div>
+            </div>
+            <div class="info-group">
+                <div class="info-label">类型(Type)</div>
+                <div class="info-value" id="detailType"></div>
+            </div>
+            <div class="info-group">
+                <div class="info-label">修改日期(Modified Date)</div>
+                <div class="info-value" id="detailDate"></div>
+            </div>
+            <div class="info-group">
+                <div class="info-label">大小(Size)</div>
+                <div class="info-value" id="detailSize"></div>
+            </div>
+        </aside>
+    </div>
+    <div class="task-bar" id="taskBar" style="display: none;"></div>
+    <footer class="status-bar">
+        <div id="statusLeft">就绪</div>
+        <div class="pagination-controls">
+            <button class="icon-btn" onclick="app.jumpToPage(1)" style="width:24px;height:24px;"
+                title="首页">&lt;&lt;</button>
+            <button class="icon-btn" onclick="app.prevPage()" style="width:24px;height:24px;" title="上一页">&lt;</button>
+            <span>第</span>
+            <input type="number" id="pageInput" class="page-input" value="1" min="1"
+                onchange="app.jumpToPage(this.value)">
+            <span id="totalPages">/ 1 页</span>
+            <button class="icon-btn" onclick="app.nextPage()" style="width:24px;height:24px;" title="下一页">&gt;</button>
+            <button class="icon-btn" onclick="app.jumpToPage(-1)" style="width:24px;height:24px;"
+                title="尾页">&gt;&gt;</button>
+        </div>
+    </footer>
+    <div id="viewerModal" class="viewer-modal">
+        <div class="viewer-toolbar">
+            <span class="viewer-title" id="viewerTitle">Preview</span>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <button id="viewerSubBtn" class="icon-btn" style="cursor:pointer; display:none;"
+                    onclick="app.triggerSubtitleLoad()" title="加载字幕">
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <use href="#icon-subtitle"></use>
+                    </svg>
+                </button>
+                <input type="file" id="subtitleInput" style="display: none;" accept=".vtt,.srt,.ass,.ssa,.lrc">
+                <button id="viewerFavBtn" class="icon-btn" style="cursor:pointer;" onclick="app.toggleFavoriteCurrent()"
+                    title="收藏">
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <use href="#icon-favorite"></use>
+                    </svg>
+                </button>
+                <a id="viewerOpenBtn" class="icon-btn" style="cursor:pointer;" href="#" target="_blank" title="在新窗口打开">
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <use href="#icon-new-tab"></use>
+                    </svg>
+                </a>
+                <a id="viewerDownloadBtn" class="icon-btn" style="cursor:pointer;" href="#" target="_blank" download
+                    title="下载">
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <use href="#icon-download"></use>
+                    </svg>
+                </a>
+                <button onclick="app.minimizeViewer()" class="icon-btn" style="cursor:pointer;" title="最小化">
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <use href="#icon-minimize"></use>
+                    </svg>
+                </button>
+                <button onclick="app.closeFile(app.state.activeFileIndex)" class="icon-btn" style="cursor:pointer;"
+                    title="关闭">
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <use href="#icon-close"></use>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="viewer-content" id="viewerContent"></div>
+    </div>
+    <div id="copyToast" class="toast">已复制内容</div>
+</body>
+</html>
