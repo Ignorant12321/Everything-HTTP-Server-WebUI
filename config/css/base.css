@@ -1,0 +1,111 @@
+/* 基础样式：主题变量、全局 reset、滚动条和页面字体。 */
+
+/* ##########
+    // 基础样式
+    ########## */
+
+:root {
+    /* Win11 亮色主题变量 */
+    --bg-mica: #f3f3f3;
+    --bg-surface: #ffffff;
+    --bg-address: #ffffff;
+    --bg-hover: #e0e0e0;
+    --text-primary: #202020;
+    --text-secondary: #5d5d5d;
+    --accent-color: #0067c0;
+    --accent-bg: #e5f3ff;
+    --border-color: #e5e5e5;
+    --divider-color: #d1d1d1;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --shadow-flyout: 0 8px 16px rgba(0, 0, 0, 0.14);
+    --viewer-bg: #ffffff;
+    --viewer-text: #333333;
+    --scrollbar-track: transparent;
+    --scrollbar-thumb: #c1c1c1;
+    --scrollbar-thumb-hover: #a8a8a8;
+    --mobile-blur-bg: rgba(255, 255, 255, 0.85);
+    --mobile-blur-border: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="dark"] {
+    /* Win11 暗色主题变量 */
+    --bg-mica: #202020;
+    --bg-surface: #191919;
+    --bg-address: #333333;
+    --bg-hover: #3a3a3a;
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0a0;
+    --accent-color: #4cc2ff;
+    --accent-bg: #3a3a3a;
+    --border-color: #383838;
+    --divider-color: #444444;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --shadow-flyout: 0 8px 16px rgba(0, 0, 0, 0.4);
+    --viewer-bg: #2c2c2c;
+    --viewer-text: #e0e0e0;
+    --scrollbar-track: transparent;
+    --scrollbar-thumb: #555;
+    --scrollbar-thumb-hover: #777;
+    --mobile-blur-bg: rgba(30, 30, 30, 0.85);
+    --mobile-blur-border: rgba(255, 255, 255, 0.1);
+}
+
+* {
+    box-sizing: border-box;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    margin: 0;
+    font-family: "Segoe UI Variable", "Segoe UI", "Microsoft YaHei", sans-serif;
+    background-color: var(--bg-mica);
+    color: var(--text-primary);
+    height: 100vh;
+    height: 100dvh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-size: 14px;
+}
+
+/* 主题过渡 */
+.sidebar,
+.file-pane,
+.details-pane,
+.status-bar,
+.flyout-menu,
+.address-input,
+input,
+button,
+svg,
+.icon-btn {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, fill 0.3s ease;
+}
+
+/* ##########
+    // 自定义滚动条
+    ########## */
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb);
+    border-radius: 5px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--scrollbar-thumb-hover);
+}

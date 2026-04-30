@@ -1,0 +1,171 @@
+/* 详情面板：预览框、属性信息、操作按钮和拖拽手柄。 */
+
+/* --- 详情面板 (Details Pane) --- */
+.details-pane {
+    width: 280px;
+    background-color: var(--bg-surface);
+    border-left: 1px solid var(--border-color);
+    display: none;
+    flex-direction: column;
+    padding: 20px;
+    overflow-y: auto;
+    position: relative;
+    z-index: 40;
+    transition: transform 0.3s cubic-bezier(0.1, 0.7, 0.1, 1);
+}
+
+.details-pane.active {
+    display: flex;
+}
+
+/* 桌面端拖拽把手 */
+.drag-handle-vertical {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 12px;
+    cursor: w-resize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--border-color);
+    font-size: 10px;
+    user-select: none;
+    z-index: 50;
+}
+
+.drag-handle-vertical::after {
+    content: '|||';
+    font-weight: bold;
+    color: var(--text-secondary);
+    opacity: 0.3;
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    letter-spacing: -2px;
+}
+
+.drag-handle-vertical:hover::after {
+    opacity: 0.8;
+    color: var(--accent-color);
+}
+
+.preview-box {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background-color: var(--bg-mica);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    font-size: 64px;
+    color: var(--text-secondary);
+}
+
+.preview-row {
+    display: flex;
+    height: 40px;
+    align-items: center;
+    border-bottom: 1px solid transparent;
+    cursor: default;
+    transition: background-color 0.1s;
+}
+
+.preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.preview-icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    display: inline-block;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+
+/* 图标容器内的图片/SVG：适配容器尺寸 */
+.preview-icon img,
+.preview-icon svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+.large-name {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    word-break: break-all;
+    line-height: 1.4;
+    margin-left: 8px;
+}
+
+.btn-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.action-btn {
+    flex: 1;
+    padding: 6px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.action-btn:hover {
+    background-color: var(--bg-hover);
+}
+
+.action-btn.primary {
+    background-color: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+.action-btn.primary:hover {
+    opacity: 0.9;
+}
+
+.info-group {
+    margin-bottom: 12px;
+}
+
+.info-label {
+    color: var(--text-secondary);
+    font-size: 12px;
+    margin-bottom: 2px;
+}
+
+.info-value {
+    color: var(--text-primary);
+    font-size: 13px;
+    word-break: break-all;
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+.info-value.copyable:hover {
+    background-color: var(--bg-hover);
+    cursor: pointer;
+}
+
+.info-value.copyable:active {
+    background-color: var(--border-color);
+}

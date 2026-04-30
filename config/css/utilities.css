@@ -1,0 +1,182 @@
+/* 通用工具：回退提示、toast、清空输入动画和通用动效。 */
+
+.fallback-msg {
+    text-align: center;
+    color: white;
+}
+
+.fallback-link {
+    color: #4cc2ff;
+    text-decoration: underline;
+    cursor: pointer;
+    display: inline-block;
+    margin-top: 8px;
+}
+
+.toast {
+    position: fixed;
+    left: 50%;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 2000;
+    bottom: 30px;
+    transform: translateX(-50%) translateY(20px) scale(0.9);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    background: rgba(30, 30, 30, 0.85);
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+    bottom: 50px;
+}
+
+.center-msg {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-secondary);
+}
+
+/* --- 清除按钮：文字飞走特效 --- */
+.input-animating {
+    color: transparent !important;
+    /* 隐藏光标和可能残留的文字 */
+}
+
+.input-animating::placeholder {
+    opacity: 0 !important;
+    /* 关键：隐藏“输入路径或搜索...” */
+    visibility: hidden;
+}
+
+/* 1. 临时覆盖层 */
+.flying-text-overlay {
+    position: fixed;
+    /* 固定定位，确保位置准确 */
+    pointer-events: none;
+    /* 让鼠标穿透，不影响底层交互 */
+    z-index: 99;
+    white-space: pre;
+    /* 保留空格 */
+    overflow: hidden;
+    /* 防止飞出太远遮挡其他元素 */
+    display: flex;
+    align-items: center;
+    /* 垂直居中 */
+}
+
+/* 2. 单个文字的飞走动画 */
+.flying-char {
+    display: inline-block;
+    opacity: 1;
+    /* 贝塞尔曲线：先慢后快，模拟飞出 */
+    animation: flyAway 0.6s cubic-bezier(0.5, 0, 1, 1) forwards;
+}
+
+/* 3. 关键帧：向上飘 + 透明 + 轻微旋转 */
+@keyframes flyAway {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+        filter: blur(0);
+    }
+
+    100% {
+        transform: translateY(-40px) rotate(10deg);
+        /* 向上飞 40px */
+        opacity: 0;
+        filter: blur(2px);
+        /* 飞走时变模糊 */
+    }
+}
+
+
+/* 用于 JS 动态添加的类 */
+.anim-rotate {
+    /* 0.5s 完成旋转，ease-in-out 让开始和结束时速度稍慢，更有质感 */
+    animation: spin-360 0.5s ease-in-out;
+}
+
+.anim-entry {
+    animation: listEntry 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    opacity: 0;
+    /* 初始隐藏 */
+}
+
+/* --- 音量控制条样式 --- */
+
+.volume-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    outline: none;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    background: #fff;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* <!-- ########## -->
+<!-- 动画效果 -->
+<!-- ########## --> */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes spin-360 {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes listEntry {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

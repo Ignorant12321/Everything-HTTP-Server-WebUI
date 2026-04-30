@@ -1,0 +1,114 @@
+/* 侧边栏：快速访问、磁盘树、收藏列表和移动端遮罩。 */
+
+/* ##########
+    // 遮罩层
+    ########## */
+
+/* 遮罩层默认样式 */
+.sidebar-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    z-index: 70;
+    /* 默认隐藏 */
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+/* 当侧边栏打开时，激活遮罩层 */
+.sidebar.show-mobile~.sidebar-mask {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* 确保侧边栏层级最高 */
+.sidebar {
+    z-index: 80;
+}
+
+/* --- 侧边栏 (Sidebar) --- */
+.sidebar {
+    width: 240px;
+    background-color: var(--bg-mica);
+    display: flex;
+    flex-direction: column;
+    padding: 12px 8px;
+    gap: 2px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    border-right: 1px solid var(--border-color);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-group-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    padding: 12px 12px 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    color: var(--text-primary);
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar-item:hover {
+    background-color: var(--bg-hover);
+}
+
+.sidebar-item.active {
+    background-color: var(--bg-hover);
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+.tree-toggle {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    color: var(--text-secondary);
+    margin-left: -6px;
+    transition: 0.2s;
+}
+
+.tree-toggle:hover {
+    background-color: var(--bg-hover);
+}
+
+.tree-toggle.rotated {
+    transform: rotate(90deg);
+}
+
+.tree-children {
+    display: none;
+    flex-direction: column;
+    margin-left: 10px;
+    border-left: 1px solid var(--border-color);
+    padding-left: 4px;
+}
+
+.tree-children.open {
+    display: flex;
+}

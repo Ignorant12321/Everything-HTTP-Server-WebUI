@@ -1,0 +1,218 @@
+/* 音频响应式：播放器在手机竖屏、横屏和字幕按钮下的布局。 */
+
+/* --- 移动端适配逻辑 --- */
+
+/* 场景 A: 竖屏手机 (宽度小于 768 且 高度大于宽度) */
+@media (max-width: 768px) and (orientation: portrait) {
+    .audio-player-container {
+        display: flex;
+        /* 改用 Flex */
+        flex-direction: column;
+        /* 垂直排列 */
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+        border: none;
+        max-height: none;
+        cursor: default;
+    }
+
+    /* 1. 封面区域 */
+    .audio-section-info {
+        flex: 0 0 auto;
+        /* 不伸缩 */
+        padding: 40px 20px 20px;
+    }
+
+    .audio-cover-img,
+    .audio-cover-placeholder {
+        width: 140px;
+        height: 140px;
+        /* 稍微缩小封面 */
+    }
+
+    /* 2. 歌词区域 (核心：flex: 1 让它占据中间所有剩余空间) */
+    .audio-section-lyrics {
+        flex: 1;
+        width: 100%;
+        border-radius: 12px 12px 0 0;
+        /* 视觉上更有层次 */
+        background: rgba(0, 0, 0, 0.1);
+        padding: 10px 20px;
+    }
+
+    /* 3. 控制区域 */
+    .audio-section-controls {
+        flex: 0 0 auto;
+        /* 固定在底部 */
+        padding: 20px 20px 40px;
+        /* 底部留多点空隙 */
+        background: transparent;
+    }
+}
+
+/* 场景 B: 横屏手机 (高度较小) */
+@media (max-height: 500px) and (orientation: landscape) {
+    .audio-player-container {
+        width: 100%;
+        height: 100%;
+        max-height: none;
+        border-radius: 0;
+        /* 保持 Grid 布局，但调整比例 */
+        grid-template-columns: 280px 1fr;
+    }
+
+    .audio-cover-img,
+    .audio-cover-placeholder {
+        width: 100px;
+        height: 100px;
+        /* 缩小封面以适应横屏 */
+        margin-bottom: 10px;
+    }
+
+    .audio-section-info {
+        padding: 10px;
+        justify-content: center;
+    }
+
+    .audio-section-controls {
+        padding: 10px 20px;
+    }
+}
+
+.audio-cover-img.playing {
+    animation: spin 10s linear infinite;
+    border-radius: 50%;
+}
+
+
+.audio-info {
+    text-align: center;
+    color: white;
+    width: 100%;
+}
+
+.audio-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.audio-artist {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.audio-controls-area {
+    width: 100%;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.audio-progress-container {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+}
+
+.audio-progress-bar {
+    height: 100%;
+    background: var(--accent-color);
+    width: 0%;
+    border-radius: 2px;
+}
+
+.audio-btn-row {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    align-items: center;
+}
+
+.audio-lyrics-section {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 15px;
+    line-height: 2;
+    scroll-behavior: smooth;
+    position: relative;
+    /* 蒙版效果 */
+    mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+}
+
+.lyric-line {
+    transition: all 0.3s;
+    cursor: pointer;
+    padding: 4px 0;
+    white-space: pre-wrap;
+    /* 允许换行 */
+}
+
+.lyric-line.active {
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    transform: scale(1.05);
+}
+
+/* 视频字幕选择器样式 */
+.cc-btn-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+}
+
+.cc-btn {
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    display: none;
+    /* 默认隐藏，有字幕时显示 */
+    backdrop-filter: blur(5px);
+}
+
+.cc-btn:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+@media (max-width: 768px) {
+    .audio-player-container {
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+    }
+
+    .audio-cover-section {
+        width: 100%;
+        height: auto;
+        flex-shrink: 0;
+        padding: 15px;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .audio-cover-img {
+        width: 120px;
+        height: 120px;
+        margin-bottom: 10px;
+    }
+}

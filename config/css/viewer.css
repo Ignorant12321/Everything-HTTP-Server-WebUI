@@ -1,0 +1,201 @@
+/* 预览窗口：弹窗、工具栏、文件容器、图片文本和 iframe 预览。 */
+
+/* --- 预览模态框 (Viewer Modal) --- */
+/* ########## 
+   修改：预览模态框与动画核心样式
+   ########## */
+
+/* 1. 模态框基础：不再使用 display:none，而是使用 visibility/opacity 以支持动画 */
+.viewer-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    /* 始终保持 flex 布局 */
+    flex-direction: column;
+
+    /* 默认背景：深色遮罩（用于视频/图片） */
+    background: rgba(0, 0, 0, 0.75);
+
+    /* 动画过渡属性 */
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    /* 隐藏时不阻挡点击 */
+    transition: background-color 0.4s ease, opacity 0.3s ease, visibility 0.3s;
+}
+
+/* 2. 打开状态 */
+.viewer-modal.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    /* 恢复交互 */
+}
+
+/* 3. 音乐模式：背景透明 */
+.viewer-modal.music-mode {
+    background: transparent !important;
+    backdrop-filter: none;
+    pointer-events: none !important;
+}
+
+.viewer-modal.music-mode .viewer-content,
+.viewer-modal.music-mode .file-container {
+    pointer-events: none !important;
+}
+
+.viewer-modal.music-mode .viewer-content,
+.viewer-modal.music-mode .viewer-toolbar,
+.viewer-modal.music-mode .audio-player-container  {
+    pointer-events: auto;
+}
+
+/* 4. 钉住时，只允许白名单内的控件响应 (按钮、进度条等) */
+.audio-player-container.pinned button,
+.audio-player-container.pinned .icon-btn,
+.audio-player-container.pinned .audio-progress-container,
+.audio-player-container.pinned .volume-wrapper,
+.audio-player-container.pinned .lyric-line {
+    pointer-events: auto !important;
+    cursor: pointer;
+}
+
+/* 4. 工具栏：透明磨砂 & 颜色自适应 */
+.viewer-toolbar {
+    height: 48px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    z-index: 10;
+
+    /* 颜色自适应：跟随主题变量 */
+    color: var(--text-primary);
+
+    /* 背景透明磨砂效果 */
+    /* 注意：这里使用 RGB 变量或 rgba 配合 var 为了通用性，
+       为了简单适配你的现有变量，我们使用半透明背景 + 模糊 */
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(128, 128, 128, 0.1);
+
+    /* 动画：位移 */
+    transform: translateY(0);
+    transition: transform 0.4s cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* 暗色模式下的工具栏适配 */
+[data-theme="dark"] .viewer-toolbar {
+    background: rgba(30, 30, 30, 0.75);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 5. 内容区域（图片/视频/播放器）容器 */
+.viewer-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+
+    /* 动画基点：底部中心 */
+    transform-origin: bottom center;
+    transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.3s ease;
+    transform: scale(0.95);
+    opacity: 0;
+}
+
+/* 打开状态 */
+.viewer-modal.open .viewer-content {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* ########## 
+   关键：最小化动画逻辑
+   ########## */
+
+/* 当添加 .minimized 类时 */
+.viewer-modal.minimized {
+    /* 背景立即透明，且允许点击穿透到底部列表 */
+    background-color: transparent !important;
+    pointer-events: none;
+    /* 稍微延迟一点隐藏 visibility，保证动画播完 */
+    transition-delay: 0s;
+}
+
+/* A. 工具栏动画：向上滑出屏幕 */
+.viewer-modal.minimized .viewer-toolbar {
+    transform: translateY(-100%);
+}
+
+/* B. 内容动画：向下滑动至任务栏并缩小消失 */
+.viewer-modal.minimized .viewer-content {
+    /* 向下位移 80vh 并缩小，模拟收入任务栏的效果 */
+    transform: translateY(80vh) scale(0.1);
+    opacity: 0;
+}
+
+/* 修正工具栏图标颜色（移除行内 style="color:white" 后需要此样式） */
+.viewer-toolbar .icon-btn {
+    color: inherit;
+    /* 跟随 toolbar 的 color */
+}
+
+.file-container {
+    width: 100%;
+    height: 100%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.file-container.active {
+    display: flex;
+}
+
+.image-viewer-container {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-viewer-container:active {
+    cursor: grabbing;
+}
+
+.image-viewer-container img {
+    max-width: 100%;
+    max-height: 100%;
+    transition: transform 0.1s ease-out;
+    transform-origin: center center;
+    user-select: none;
+}
+
+.viewer-text {
+    background: var(--viewer-bg);
+    color: var(--viewer-text);
+    padding: 20px;
+    width: 80%;
+    height: 90%;
+    overflow: auto;
+    border-radius: 4px;
+    white-space: pre-wrap;
+    font-family: monospace;
+    border: 1px solid var(--border-color);
+}
+
+.viewer-iframe {
+    width: 80%;
+    height: 90%;
+    background: white;
+    border: none;
+    border-radius: 4px;
+}
