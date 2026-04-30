@@ -19,21 +19,8 @@ function attachDetailsMethods(app) {
 
         if (!isDir && imgs.includes(ext)) {
             this.dom.previewBox.innerHTML = `<img src="${fakeUrl}" class="preview-img">`;
-            this.dom.detailIcon.innerHTML = `<img src="${fakeUrl}">`;
         } else {
             this.dom.previewBox.innerHTML = icon;
-            this.dom.detailIcon.innerHTML = icon;
-            this.dom.detailIcon.style.display = 'flex';
-            this.dom.detailIcon.style.alignItems = 'center';
-            this.dom.detailIcon.style.justifyContent = 'center';
-            this.dom.detailIcon.style.fontSize = '18px';
-        }
-        if (window.innerWidth > 768) {
-            this.dom.detailIcon.innerHTML = icon;
-            this.dom.detailIcon.style.display = 'flex';
-            this.dom.detailIcon.style.alignItems = 'center';
-            this.dom.detailIcon.style.justifyContent = 'center';
-            this.dom.detailIcon.style.fontSize = '18px';
         }
 
         document.getElementById('detailName').textContent = item.name;

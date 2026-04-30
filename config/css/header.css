@@ -18,8 +18,9 @@
 
 .nav-controls {
     display: flex;
-    gap: 4px;
+    gap: 2px;
     align-items: center;
+    flex-shrink: 0;
 }
 
 .icon-btn {
@@ -34,6 +35,10 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+}
+
+.icon-btn:not(:disabled):hover {
+    background-color: var(--bg-hover);
 }
 
 .icon-btn:active:not(:disabled) {
@@ -59,10 +64,11 @@
     flex: 1;
     display: flex;
     align-items: center;
+    gap: 6px;
     background-color: var(--bg-address);
     border-bottom: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
-    padding: 0 8px 0 12px;
+    padding: 0 8px 0 4px;
     height: 34px;
     margin: 0 8px;
     transition: 0.2s;
@@ -71,10 +77,42 @@
     position: relative;
 }
 
+.address-container .nav-controls {
+    margin-right: 4px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.address-container .nav-controls .icon-btn {
+    width: 30px;
+    height: 30px;
+}
+
 .address-container:focus-within {
     background-color: var(--bg-surface);
     border-color: var(--accent-color);
     box-shadow: 0 0 0 2px rgba(0, 103, 192, 0.2);
+}
+
+.address-container::after {
+    content: '';
+    position: absolute;
+    left: calc(100% - 34px);
+    right: 8px;
+    bottom: 5px;
+    height: 2px;
+    border-radius: 999px;
+    background: var(--accent-color);
+    opacity: 0;
+    transform: scaleX(0);
+    transform-origin: right center;
+    pointer-events: none;
+}
+
+.address-container.is-clearing::after {
+    animation: clearUnderlineSweep 0.22s cubic-bezier(0.2, 0, 0, 1);
 }
 
 .address-input {
@@ -83,10 +121,11 @@
     background: transparent;
     color: var(--text-primary);
     font-size: 14px;
-    margin-left: 4px;
+    margin-left: 0;
     font-family: inherit;
     width: 100%;
     height: 100%;
+    min-width: 0;
 }
 
 .clear-btn {
@@ -95,15 +134,26 @@
     cursor: pointer;
     padding: 4px;
     border-radius: 50%;
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
 }
 
 .clear-btn:hover {
     background-color: var(--bg-hover);
     color: var(--text-primary);
+    transform: scale(1.04);
+}
+
+.clear-btn:active {
+    transform: scale(0.92);
 }
 
 .address-input:not(:placeholder-shown)+.clear-btn {
-    display: block;
+    display: flex;
 }
 
 @media (max-width: 768px) {

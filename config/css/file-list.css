@@ -3,7 +3,7 @@
 /* --- 文件列表区域 (File Pane) --- */
 .file-pane {
     flex: 1;
-    background-color: var(--bg-surface);
+    background-color: var(--bg-pane);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -46,7 +46,7 @@
     top: 25%;
     bottom: 25%;
     width: 1px;
-    background-color: var(--divider-color);
+    background-color: var(--static-hairline);
     pointer-events: none;
 }
 
@@ -64,6 +64,7 @@
 
 #fileList {
     flex: 1;
+    background-color: var(--bg-pane);
     overflow-y: auto;
     overflow-x: hidden;
     padding-bottom: 40px;
@@ -86,7 +87,7 @@
 
 .file-row:active {
     transform: scale(0.98);
-    background-color: var(--bg-hover) !important;
+    background-color: var(--row-hover) !important;
 }
 
 .sidebar-item:active {
@@ -94,11 +95,11 @@
 }
 
 .file-row:hover {
-    background-color: var(--bg-hover);
+    background-color: var(--row-hover);
 }
 
 .file-row.selected {
-    background-color: var(--accent-bg);
+    background-color: var(--row-selected);
 }
 
 .file-row.selected .file-name {
@@ -121,6 +122,100 @@
     font-size: 18px;
     margin-right: 8px;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+}
+
+.file-type-icon {
+    width: 26px;
+    height: 26px;
+    display: block;
+    overflow: visible;
+}
+
+.file-icon-shadow {
+    fill: rgba(0, 0, 0, 0.14);
+    transform: translate(1px, 1px);
+}
+
+.file-icon-bg {
+    fill: #e9eef7;
+}
+
+.file-icon-fold {
+    fill: rgba(255, 255, 255, 0.55);
+}
+
+.file-icon-mark {
+    fill: rgba(255, 255, 255, 0.88);
+}
+
+.file-icon-cut,
+.folder-line {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.88);
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.file-icon-label {
+    fill: rgba(255, 255, 255, 0.9);
+    font-size: 7px;
+    font-weight: 800;
+    letter-spacing: 0;
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.file-icon-folder .folder-back {
+    fill: #8cc8ff;
+}
+
+.file-icon-folder .folder-front {
+    fill: #4f9ef7;
+}
+
+.file-icon-image .file-icon-bg {
+    fill: #24a891;
+}
+
+.file-icon-audio .file-icon-bg {
+    fill: #7c5cff;
+}
+
+.file-icon-video .file-icon-bg {
+    fill: #f05a7e;
+}
+
+.file-icon-archive .file-icon-bg {
+    fill: #d38824;
+}
+
+.file-icon-code .file-icon-bg {
+    fill: #2970cc;
+}
+
+.file-icon-pdf .file-icon-bg {
+    fill: #e14d42;
+}
+
+.file-icon-program .file-icon-bg {
+    fill: #384150;
+}
+
+.file-icon-sheet .file-icon-bg {
+    fill: #1b9a63;
+}
+
+.file-icon-doc .file-icon-bg {
+    fill: #4d7bd9;
+}
+
+.file-icon-generic .file-icon-bg {
+    fill: #738195;
 }
 
 .cell-name {
@@ -155,11 +250,11 @@
 }
 
 #fileList.view-grid .file-row:hover {
-    background-color: var(--bg-hover);
+    background-color: var(--row-hover);
 }
 
 #fileList.view-grid .file-row.selected {
-    background-color: var(--accent-bg);
+    background-color: var(--row-selected);
     border-color: rgba(0, 0, 0, 0.05);
 }
 
@@ -169,11 +264,17 @@
     flex: 1;
     align-items: flex-end;
     width: 100%;
+    height: auto;
     justify-content: center;
 }
 
+#fileList.view-grid .file-type-icon {
+    width: 58px;
+    height: 58px;
+}
+
 #fileList.view-grid .cell-name {
-    felex-shrink: 1;
+    flex-shrink: 1;
     min-width: 200px;
     font-size: 13px;
     width: 100%;

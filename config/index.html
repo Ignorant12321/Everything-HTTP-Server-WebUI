@@ -4,93 +4,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Everything Explorer Ultimate</title>
-    <link rel="stylesheet" href="../config/css/base.css">
-    <link rel="stylesheet" href="../config/css/layout.css">
-    <link rel="stylesheet" href="../config/css/header.css">
-    <link rel="stylesheet" href="../config/css/sidebar.css">
-    <link rel="stylesheet" href="../config/css/file-list.css">
-    <link rel="stylesheet" href="../config/css/details.css">
-    <link rel="stylesheet" href="../config/css/viewer.css">
-    <link rel="stylesheet" href="../config/css/audio-player.css">
-    <link rel="stylesheet" href="../config/css/audio-volume.css">
-    <link rel="stylesheet" href="../config/css/responsive-audio.css">
-    <link rel="stylesheet" href="../config/css/utilities.css">
-    <link rel="stylesheet" href="../config/css/responsive.css">
-    <script defer src="../config/vendor/jsmediatags.min.js?v=20260430"></script>
-    <script defer src="../config/js/svg-symbols.js?v=20260430"></script>
-    <script defer src="../config/js/config.js?v=20260430"></script>
-    <script defer src="../config/js/icons.js?v=20260430"></script>
-    <script defer src="../config/js/state.js?v=20260430"></script>
-    <script defer src="../config/js/dom.js?v=20260430"></script>
-    <script defer src="../config/js/format.js?v=20260430"></script>
-    <script defer src="../config/js/api.js?v=20260430"></script>
-    <script defer src="../config/js/navigation.js?v=20260430"></script>
-    <script defer src="../config/js/render-list.js?v=20260430"></script>
-    <script defer src="../config/js/details.js?v=20260430"></script>
-    <script defer src="../config/js/favorites.js?v=20260430"></script>
-    <script defer src="../config/js/viewer.js?v=20260430"></script>
-    <script defer src="../config/js/audio-lyrics.js?v=20260430"></script>
-    <script defer src="../config/js/audio-init.js?v=20260430"></script>
-    <script defer src="../config/js/audio-player.js?v=20260430"></script>
-    <script defer src="../config/js/subtitles.js?v=20260430"></script>
-    <script defer src="../config/js/interactions.js?v=20260430"></script>
-    <script defer src="../config/js/drag.js?v=20260430"></script>
-    <script defer src="../config/js/lifecycle.js?v=20260430"></script>
-    <script defer src="../config/js/app.js?v=20260430"></script>
+    <link rel="stylesheet" href="../config/css/base.css?v=20260430-ui7">
+    <link rel="stylesheet" href="../config/css/layout.css?v=20260430-ui7">
+    <link rel="stylesheet" href="../config/css/header.css?v=20260430-ui7">
+    <link rel="stylesheet" href="../config/css/sidebar.css?v=20260430-ui7">
+    <link rel="stylesheet" href="../config/css/file-list.css?v=20260430-ui7">
+    <link rel="stylesheet" href="../config/css/details.css?v=20260430-ui7">
+    <link rel="stylesheet" href="../config/css/viewer.css?v=20260430-ui7">
+    <link rel="stylesheet" href="../config/css/audio-player.css?v=20260430-ui7">
+    <link rel="stylesheet" href="../config/css/audio-volume.css?v=20260430-ui7">
+    <link rel="stylesheet" href="../config/css/responsive-audio.css?v=20260430-ui7">
+    <link rel="stylesheet" href="../config/css/utilities.css?v=20260430-ui7">
+    <link rel="stylesheet" href="../config/css/responsive.css?v=20260430-ui7">
+    <script defer src="../config/vendor/jsmediatags.min.js?v=20260430-ui7"></script>
+    <script defer src="../config/js/svg-symbols.js?v=20260430-ui7"></script>
+    <script defer src="../config/js/config.js?v=20260430-ui7"></script>
+    <script defer src="../config/js/icons.js?v=20260430-ui7"></script>
+    <script defer src="../config/js/state.js?v=20260430-ui7"></script>
+    <script defer src="../config/js/dom.js?v=20260430-ui7"></script>
+    <script defer src="../config/js/format.js?v=20260430-ui7"></script>
+    <script defer src="../config/js/api.js?v=20260430-ui7"></script>
+    <script defer src="../config/js/navigation.js?v=20260430-ui7"></script>
+    <script defer src="../config/js/render-list.js?v=20260430-ui7"></script>
+    <script defer src="../config/js/details.js?v=20260430-ui7"></script>
+    <script defer src="../config/js/favorites.js?v=20260430-ui7"></script>
+    <script defer src="../config/js/viewer.js?v=20260430-ui7"></script>
+    <script defer src="../config/js/audio-lyrics.js?v=20260430-ui7"></script>
+    <script defer src="../config/js/audio-init.js?v=20260430-ui7"></script>
+    <script defer src="../config/js/audio-player.js?v=20260430-ui7"></script>
+    <script defer src="../config/js/subtitles.js?v=20260430-ui7"></script>
+    <script defer src="../config/js/interactions.js?v=20260430-ui7"></script>
+    <script defer src="../config/js/drag.js?v=20260430-ui7"></script>
+    <script defer src="../config/js/lifecycle.js?v=20260430-ui7"></script>
+    <script defer src="../config/js/app.js?v=20260430-ui7"></script>
 </head>
 <body>
     <header class="app-header">
+        <button id="mobileMenuBtn" class="icon-btn" onclick="app.toggleSidebar()" title="侧边栏">
+            <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                <use href="#icon-mobileMenuBtn"></use>
+            </svg>
+        </button>
         <div class="address-container">
+            <div class="nav-controls">
+                <button class="icon-btn" id="btnBack" onclick="app.goBack()" disabled title="后退">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <use href="#icon-btnBack"></use>
+                    </svg>
+                </button>
+                <button class="icon-btn" id="btnForward" onclick="app.goForward()" disabled title="前进">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <use href="#icon-btnForward"></use>
+                    </svg>
+                </button>
+                <button class="icon-btn" id="btnGoUp" onclick="app.goUp()" title="向上级">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <use href="#icon-btnGoUp"></use>
+                    </svg>
+                </button>
+                <button class="icon-btn" id="btnRefresh" onclick="app.refresh()" title="刷新">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <use href="#icon-btnRefresh"></use>
+                    </svg>
+                </button>
+            </div>
             <svg width="18px" height="18px" fill="gray" viewBox="0 0 16 16" style="margin-right: 8px;">
                 <use href="#icon-adress"></use>
             </svg>
             <input type="text" id="addressInput" class="address-input" placeholder="输入路径或搜索..." autocomplete="off">
             <div id="clearSearchBtn" class="clear-btn" title="清除内容">
                 <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <use href="#icon-clearSearchBtn"></use>
+                    <path d="M8 1.6a6.4 6.4 0 1 0 0 12.8A6.4 6.4 0 0 0 8 1.6zm2.35 8.05a.5.5 0 0 1-.7.7L8 8.7l-1.65 1.65a.5.5 0 0 1-.7-.7L7.3 8 5.65 6.35a.5.5 0 0 1 .7-.7L8 7.3l1.65-1.65a.5.5 0 0 1 .7.7L8.7 8l1.65 1.65z"></path>
                 </svg>
             </div>
-        </div>
-        <div class="nav-controls">
-            <button id="mobileMenuBtn" class="icon-btn" onclick="app.toggleSidebar()">
-                <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
-                    <use href="#icon-mobileMenuBtn"></use>
-                </svg>
-            </button>
-            <button class="icon-btn" id="btnBack" onclick="app.goBack()" disabled title="后退">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <use href="#icon-btnBack"></use>
-                </svg>
-            </button>
-            <button class="icon-btn" id="btnForward" onclick="app.goForward()" disabled title="前进">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <use href="#icon-btnForward"></use>
-                </svg>
-            </button>
-            <button class="icon-btn" id="btnGoUp" onclick="app.goUp()" title="向上级">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <use href="#icon-btnGoUp"></use>
-                </svg>
-            </button>
-            <button class="icon-btn" id="btnRefresh" onclick="app.refresh()" title="刷新">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <use href="#icon-btnRefresh"></use>
-                </svg>
-            </button>
-            <button class="icon-btn" style="display:none;" id="mobileMoreBtn" onclick="app.toggleSettingsMenu(event)">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <use href="#icon-mobileMoreBtn"></use>
-                </svg>
-            </button>
         </div>
         <button class="icon-btn" onclick="app.sort('name')" title="排序">
             <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                 <use href="#icon-sort"></use>
             </svg>
         </button>
-        <button class="icon-btn" onclick="app.toggleViewMenu(event)" title="视图布局">
-            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <use href="#icon-view"></use>
+        <button class="icon-btn" id="viewToggleBtn" onclick="app.toggleViewMenu(event)" title="切换视图布局">
+            <svg id="viewToggleIcon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M2 2.5A1.5 1.5 0 0 1 3.5 1h3A1.5 1.5 0 0 1 8 2.5v3A1.5 1.5 0 0 1 6.5 7h-3A1.5 1.5 0 0 1 2 5.5v-3zM3.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM9 2.5A1.5 1.5 0 0 1 10.5 1h2A1.5 1.5 0 0 1 14 2.5v3A1.5 1.5 0 0 1 12.5 7h-2A1.5 1.5 0 0 1 9 5.5v-3zM10.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-2zM2 10.5A1.5 1.5 0 0 1 3.5 9h3A1.5 1.5 0 0 1 8 10.5v3A1.5 1.5 0 0 1 6.5 15h-3A1.5 1.5 0 0 1 2 13.5v-3zM3.5 10a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM9 10.5A1.5 1.5 0 0 1 10.5 9h2a1.5 1.5 0 0 1 1.5 1.5v3A1.5 1.5 0 0 1 12.5 15h-2A1.5 1.5 0 0 1 9 13.5v-3zM10.5 10a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-2z"></path>
             </svg>
         </button>
         <button class="icon-btn" onclick="app.toggleTheme()" title="切换主题">
@@ -99,6 +94,11 @@
         <button class="icon-btn" onclick="app.toggleSettingsMenu(event)" title="更多选项">
             <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                 <use href="#icon-settings"></use>
+            </svg>
+        </button>
+        <button class="icon-btn" style="display:none;" id="mobileMoreBtn" onclick="app.toggleSettingsMenu(event)" title="更多选项">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <use href="#icon-mobileMoreBtn"></use>
             </svg>
         </button>
     </header>
@@ -158,7 +158,6 @@
             <div class="drag-handle-horizontal" id="dragHandleMobile_detail"></div>
             <div class="preview-box" style="gap: 8px;" id="previewBox"></div>
             <div class="preview-row">
-                <div class="preview-icon" id="detailIcon"></div>
                 <div class="large-name" id="detailName">Filename</div>
             </div>
             <div class="btn-group">

@@ -9,15 +9,21 @@
     --bg-mica: #f3f3f3;
     --bg-surface: #ffffff;
     --bg-address: #ffffff;
+    --bg-pane: #ffffff;
     --bg-hover: #e0e0e0;
+    --row-hover: #f0f6ff;
+    --row-selected: #e5f3ff;
     --text-primary: #202020;
     --text-secondary: #5d5d5d;
     --accent-color: #0067c0;
     --accent-bg: #e5f3ff;
     --border-color: #e5e5e5;
     --divider-color: #d1d1d1;
+    --static-hairline: rgba(128, 128, 128, 0.24);
     --radius-sm: 4px;
     --radius-md: 6px;
+    --theme-transition: 220ms cubic-bezier(0.2, 0, 0, 1);
+    --motion-fast: 120ms cubic-bezier(0.2, 0, 0, 1);
     --shadow-flyout: 0 8px 16px rgba(0, 0, 0, 0.14);
     --viewer-bg: #ffffff;
     --viewer-text: #333333;
@@ -30,16 +36,19 @@
 
 [data-theme="dark"] {
     /* Win11 暗色主题变量 */
-    --bg-mica: #202020;
-    --bg-surface: #191919;
-    --bg-address: #333333;
-    --bg-hover: #3a3a3a;
-    --text-primary: #ffffff;
-    --text-secondary: #a0a0a0;
+    --bg-mica: #1b1b1b;
+    --bg-surface: #242424;
+    --bg-address: #2c2c2c;
+    --bg-pane: #202020;
+    --bg-hover: #303030;
+    --row-hover: #2a2f36;
+    --row-selected: #22384c;
+    --text-primary: #f5f5f5;
+    --text-secondary: #b8b8b8;
     --accent-color: #4cc2ff;
-    --accent-bg: #3a3a3a;
-    --border-color: #383838;
-    --divider-color: #444444;
+    --accent-bg: #22384c;
+    --border-color: #343434;
+    --divider-color: #4a4a4a;
     --radius-sm: 4px;
     --radius-md: 6px;
     --shadow-flyout: 0 8px 16px rgba(0, 0, 0, 0.4);
@@ -83,7 +92,7 @@ input,
 button,
 svg,
 .icon-btn {
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, fill 0.3s ease;
+    transition: background-color var(--theme-transition), color var(--theme-transition), border-color var(--theme-transition), fill var(--theme-transition);
 }
 
 /* ##########

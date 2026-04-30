@@ -1,16 +1,89 @@
 /* 通用工具：回退提示、toast、清空输入动画和通用动效。 */
 
-.fallback-msg {
+/* 统一主题切换节奏，避免局部组件先黑先白。 */
+.app-header,
+.address-container,
+.address-input,
+.icon-btn,
+.clear-btn,
+.sidebar,
+.sidebar-item,
+.sidebar-group-title,
+.tree-toggle,
+.file-pane,
+#fileList,
+.grid-header,
+.header-cell,
+.file-row,
+.cell-name,
+.cell-meta,
+.cell-type,
+.details-pane,
+.preview-box,
+.action-btn,
+.info-label,
+.info-value,
+.task-bar,
+.task-item,
+.status-bar,
+.page-input,
+.flyout-menu,
+.menu-item {
+    transition: background-color var(--theme-transition), color var(--theme-transition), border-color var(--theme-transition), fill var(--theme-transition), box-shadow var(--theme-transition), opacity var(--theme-transition), transform var(--motion-fast);
+}
+
+.file-container .fallback-msg {
     text-align: center;
     color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+}
+
+.file-container .fallback-msg .file-type-icon {
+    width: 144px;
+    height: 144px;
+}
+
+.file-container .fallback-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: nowrap;
 }
 
 .fallback-link {
     color: #4cc2ff;
-    text-decoration: underline;
+    text-decoration: none;
     cursor: pointer;
-    display: inline-block;
-    margin-top: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
+    padding: 8px 14px;
+    white-space: nowrap;
+    border: 1px solid rgba(76, 194, 255, 0.45);
+    border-radius: 6px;
+    background: rgba(76, 194, 255, 0.12);
+    font: inherit;
+}
+
+.fallback-download {
+    color: white;
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+.fallback-cancel {
+    color: rgba(255, 255, 255, 0.88);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.22);
+}
+
+.fallback-link:hover {
+    filter: brightness(1.08);
 }
 
 .toast {
@@ -74,30 +147,38 @@
     display: flex;
     align-items: center;
     /* 垂直居中 */
+    contain: layout paint style;
+    will-change: transform, opacity;
+    transform-origin: right center;
+    animation: clearTextAway 0.22s cubic-bezier(0.2, 0, 0, 1) forwards;
 }
 
-/* 2. 单个文字的飞走动画 */
-.flying-char {
-    display: inline-block;
-    opacity: 1;
-    /* 贝塞尔曲线：先慢后快，模拟飞出 */
-    animation: flyAway 0.6s cubic-bezier(0.5, 0, 1, 1) forwards;
-}
-
-/* 3. 关键帧：向上飘 + 透明 + 轻微旋转 */
-@keyframes flyAway {
+@keyframes clearTextAway {
     0% {
-        transform: translateY(0) rotate(0deg);
+        transform: translate3d(0, 0, 0) scaleX(1);
         opacity: 1;
-        filter: blur(0);
     }
 
     100% {
-        transform: translateY(-40px) rotate(10deg);
-        /* 向上飞 40px */
+        transform: translate3d(8px, 0, 0) scaleX(0.96);
         opacity: 0;
-        filter: blur(2px);
-        /* 飞走时变模糊 */
+    }
+}
+
+@keyframes clearUnderlineSweep {
+    0% {
+        opacity: 0;
+        transform: scaleX(0);
+    }
+
+    35% {
+        opacity: 0.9;
+        transform: scaleX(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scaleX(0.08);
     }
 }
 

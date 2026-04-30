@@ -77,7 +77,7 @@
     padding-bottom: env(safe-area-inset-bottom);
     padding-top: 4px;
     padding-bottom: 4px;
-    background-color: var(--bg-surface);
+    background-color: var(--bg-mica);
     border-top: 1px solid var(--border-color);
     display: flex;
     align-items: center;

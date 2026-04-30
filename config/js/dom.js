@@ -8,7 +8,6 @@ function queryDom() {
         driveList: document.getElementById('driveList'),       // 磁盘列表容器
         favList: document.getElementById('favList'),           // 收藏列表容器
         previewBox: document.getElementById('previewBox'),     // 文件预览容器
-        detailIcon: document.getElementById('detailIcon'),     // 详情面板中的文件图标容器
         pageInput: document.getElementById('pageInput'),       // 分页页码输入框
         totalPages: document.getElementById('totalPages'),     // 总页数显示元素
         btnRefresh: document.getElementById('btnRefresh'),       // 刷新按钮

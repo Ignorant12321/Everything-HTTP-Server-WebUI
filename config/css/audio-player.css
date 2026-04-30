@@ -8,6 +8,9 @@
 
 /* 1. 容器：默认采用 Grid 布局 (适配 PC 和 横屏手机) */
 .audio-player-container {
+    --audio-cover-lift-desktop: -24px;
+    --audio-cover-lift-mobile: -10px;
+
     /* 1. 改为绝对定位，以便拖动 */
     position: absolute;
     /* 2. 初始居中显示 */
@@ -126,6 +129,7 @@
     min-height: 0;
     user-select: none;
     /* 防止溢出 */
+    transform: translateY(var(--audio-cover-lift-desktop));
 }
 
 .audio-section-lyrics {

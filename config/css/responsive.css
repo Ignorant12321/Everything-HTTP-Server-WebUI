@@ -22,11 +22,23 @@
         /* 强制满宽 */
         margin: 0;
         height: 40px;
-        padding-left: 12px;
+        padding-left: 6px;
         order: 1;
         /* 排序第一 */
         flex-basis: 100%;
         /* Flex 换行基础 */
+    }
+
+    .address-container .nav-controls {
+        order: 0;
+        flex-grow: 0;
+        width: auto;
+        gap: 2px;
+    }
+
+    .address-container .nav-controls .icon-btn {
+        width: 30px;
+        height: 30px;
     }
 
     /* 导航和工具放到第二行 */
@@ -53,6 +65,7 @@
         display: flex;
         margin-right: 4px;
         position: static;
+        order: 2;
     }
 
     .sidebar {

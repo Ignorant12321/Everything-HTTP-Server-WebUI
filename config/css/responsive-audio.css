@@ -15,13 +15,15 @@
         border: none;
         max-height: none;
         cursor: default;
+        --audio-cover-lift-mobile: -14px;
     }
 
     /* 1. 封面区域 */
     .audio-section-info {
         flex: 0 0 auto;
         /* 不伸缩 */
-        padding: 40px 20px 20px;
+        padding: 34px 20px 14px;
+        transform: translateY(var(--audio-cover-lift-mobile));
     }
 
     .audio-cover-img,
@@ -38,14 +40,15 @@
         border-radius: 12px 12px 0 0;
         /* 视觉上更有层次 */
         background: rgba(0, 0, 0, 0.1);
-        padding: 10px 20px;
+        padding: 8px 20px 10px;
+        min-height: 0;
     }
 
     /* 3. 控制区域 */
     .audio-section-controls {
         flex: 0 0 auto;
         /* 固定在底部 */
-        padding: 20px 20px 40px;
+        padding: 16px 20px 40px;
         /* 底部留多点空隙 */
         background: transparent;
     }
@@ -60,6 +63,7 @@
         border-radius: 0;
         /* 保持 Grid 布局，但调整比例 */
         grid-template-columns: 280px 1fr;
+        --audio-cover-lift-desktop: -8px;
     }
 
     .audio-cover-img,
@@ -73,6 +77,7 @@
     .audio-section-info {
         padding: 10px;
         justify-content: center;
+        transform: translateY(var(--audio-cover-lift-desktop));
     }
 
     .audio-section-controls {
@@ -199,6 +204,7 @@
         width: 100%;
         height: 100%;
         border-radius: 0;
+        --audio-cover-lift-mobile: -12px;
     }
 
     .audio-cover-section {

@@ -106,9 +106,13 @@ function attachViewerMethods(app) {
             } else {
                 newContainer.innerHTML = `
                             <div class="fallback-msg">
-                                <div style="font-size:48px;margin-bottom:10px">📄</div>
+                                ${this.getFileIcon(file.name, false)}
                                 <div>此文件类型 (${file.ext}) 不支持预览</div>
-                                <a class="fallback-link" href="${file.url}" target="_blank">在新窗口打开</a>
+                                <div class="fallback-actions">
+                                    <a class="fallback-link fallback-download" href="${file.url}" download="${file.name}">立即下载</a>
+                                    <a class="fallback-link fallback-open" href="${file.url}" target="_blank">在新窗口打开</a>
+                                    <button class="fallback-link fallback-cancel" type="button" onclick="app.closeFile(app.state.activeFileIndex, event)">取消</button>
+                                </div>
                             </div>`;
             }
         } catch (e) { newContainer.innerHTML = `<div style="color:red">加载失败: ${e.message}</div>`; }

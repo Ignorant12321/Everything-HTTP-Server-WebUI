@@ -61,17 +61,23 @@
     margin-bottom: 16px;
     overflow: hidden;
     border: 1px solid var(--border-color);
-    font-size: 64px;
+    font-size: 76px;
     color: var(--text-secondary);
+}
+
+.preview-box .file-type-icon {
+    width: 96px;
+    height: 96px;
 }
 
 .preview-row {
     display: flex;
-    height: 40px;
+    min-height: 40px;
     align-items: center;
     border-bottom: 1px solid transparent;
     cursor: default;
     transition: background-color 0.1s;
+    margin-bottom: 16px;
 }
 
 .preview-img {
@@ -80,31 +86,12 @@
     object-fit: contain;
 }
 
-.preview-icon {
-    width: 36px;
-    height: 36px;
-    flex-shrink: 0;
-    display: inline-block;
-    overflow: hidden;
-    margin-bottom: 16px;
-}
-
-/* 图标容器内的图片/SVG：适配容器尺寸 */
-.preview-icon img,
-.preview-icon svg {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-}
-
 .large-name {
     font-size: 16px;
     font-weight: 600;
-    margin-bottom: 16px;
     word-break: break-all;
     line-height: 1.4;
-    margin-left: 8px;
+    margin: 0;
 }
 
 .btn-group {
