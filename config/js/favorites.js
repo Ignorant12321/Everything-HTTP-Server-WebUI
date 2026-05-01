@@ -5,7 +5,7 @@ function attachFavoriteMethods(app) {
   app.renderFavorites = function renderFavorites() {
         const list = this.dom.favList; // 获取侧边栏收藏列表容器
         if (this.state.favorites.length === 0) {
-            list.innerHTML = `<div style="padding:4px 12px; color:var(--text-secondary); font-size:12px">暂无收藏文件</div>`;
+            list.innerHTML = `<div class="sidebar-empty">暂无收藏文件</div>`;
             return;
         }
         let html = '';

@@ -9,9 +9,11 @@
 .sidebar,
 .sidebar-item,
 .sidebar-group-title,
+.sidebar-empty,
 .tree-toggle,
 .file-pane,
 #fileList,
+.center-msg,
 .grid-header,
 .header-cell,
 .file-row,
@@ -30,6 +32,13 @@
 .flyout-menu,
 .menu-item {
     transition: background-color var(--theme-transition), color var(--theme-transition), border-color var(--theme-transition), fill var(--theme-transition), box-shadow var(--theme-transition), opacity var(--theme-transition), transform var(--motion-fast);
+}
+
+.menu-caption {
+    padding: 4px 12px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    transition: color var(--theme-transition);
 }
 
 .file-container .fallback-msg {

@@ -8,7 +8,7 @@ function attachRenderListMethods(app) {
                 <rect class="file-icon-bg" x="6" y="4" width="34" height="38" rx="9"></rect>
                 <path class="file-icon-fold" d="M30 4h2.5L40 11.5V14h-7a3 3 0 0 1-3-3V4z"></path>
                 ${body}
-                <text class="file-icon-label" x="23" y="36" text-anchor="middle">${label}</text>
+                <text class="file-icon-label" x="38" y="39" text-anchor="end">${label}</text>
             </svg>`;
   };
 

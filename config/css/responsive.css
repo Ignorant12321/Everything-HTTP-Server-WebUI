@@ -29,18 +29,6 @@
         /* Flex 换行基础 */
     }
 
-    .address-container .nav-controls {
-        order: 0;
-        flex-grow: 0;
-        width: auto;
-        gap: 2px;
-    }
-
-    .address-container .nav-controls .icon-btn {
-        width: 30px;
-        height: 30px;
-    }
-
     /* 导航和工具放到第二行 */
     .nav-controls {
         order: 2;

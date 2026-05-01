@@ -43,7 +43,7 @@
     flex-shrink: 0;
     overflow-y: auto;
     border-right: 1px solid var(--border-color);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background-color var(--theme-transition), color var(--theme-transition), border-color var(--theme-transition), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .sidebar-group-title {
@@ -54,6 +54,12 @@
     display: flex;
     align-items: center;
     gap: 6px;
+}
+
+.sidebar-empty {
+    padding: 4px 12px;
+    color: var(--text-secondary);
+    font-size: 12px;
 }
 
 .sidebar-item {

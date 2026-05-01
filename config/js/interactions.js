@@ -146,4 +146,49 @@ function attachInteractionMethods(app) {
         child.classList.toggle('open');
         el.classList.toggle('rotated');
     };
+
+  app.isTextEditingTarget = function isTextEditingTarget(target) {
+        if (!target) return false;
+        if (target.isContentEditable) return true;
+        const tagName = (target.tagName || '').toUpperCase();
+        return ['INPUT', 'TEXTAREA', 'SELECT'].includes(tagName);
+  };
+
+  app.handleGlobalKeydown = function handleGlobalKeydown(e) {
+        if (this.isTextEditingTarget(e.target)) return;
+
+        if (e.key === ' ' || e.key === 'Spacebar') {
+            const viewerClassList = this.dom.viewerModal && this.dom.viewerModal.classList;
+            if (viewerClassList && viewerClassList.contains('open') && !viewerClassList.contains('minimized')) {
+                e.preventDefault();
+                this.closeFile(this.state.activeFileIndex);
+                return;
+            }
+            if (!this.state.selectedItem) return;
+            e.preventDefault();
+            this.handleOpenAction(this.state.selectedItem);
+            return;
+        }
+
+        if (e.key === 'Escape') {
+            const viewerClassList = this.dom.viewerModal && this.dom.viewerModal.classList;
+            const viewerOpen = viewerClassList && viewerClassList.contains('open');
+            const viewerMinimized = viewerClassList && viewerClassList.contains('minimized');
+
+            e.preventDefault();
+            if (viewerOpen && !viewerMinimized) {
+                this.minimizeViewer();
+                return;
+            }
+
+            this.dom.viewMenu.classList.remove('show');
+            this.dom.settingsMenu.classList.remove('show');
+            this.dom.sidebar.classList.remove('show-mobile');
+            this.closeDetails();
+        }
+  };
+
+  app.initKeyboardShortcuts = function initKeyboardShortcuts() {
+        document.addEventListener('keydown', (e) => this.handleGlobalKeydown(e));
+  };
 }

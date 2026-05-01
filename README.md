@@ -6,7 +6,7 @@ Everything的HTTP服务器界面UI，支持文件预览/查看功能
 
 ### 下载
 
-Everything-HTTP-Server-WebUI压缩包并解压到指定位置，如：`D:\Data\Share\config`，注意文件目录结构：
+Everything-HTTP-Server-WebUI压缩包并解压到指定位置，复制config文件夹到指定位置，如：`D:\Data\Share`，注意文件目录结构：
 
 ```text
 config/
@@ -29,7 +29,7 @@ defaultPath=D:\Data\Share
 
 `defaultPath` 是 WebUI 页面加载后默认进入的文件夹。可以直接从 Windows 资源管理器复制路径后粘贴到这里。
 
-解释：
+区分：
 
 | 设置                           | 控制什么                           |
 | :----------------------------- | :--------------------------------- |
@@ -43,6 +43,8 @@ defaultPath=D:\Data\Share
   ![alt text](.assest/image-5.png)
 
   ![alt text](.assest/image.png)
+
+建议配置用户名和密码！！！
 
 ### 查找本机IP
 
@@ -59,6 +61,12 @@ defaultPath=D:\Data\Share
 
 ## 功能
 
+### 顶部导航栏
+
+- 导航按钮：前进、后退、上一级、刷新等
+- 搜索框、清除按钮
+- 功能：排序、视图、深色模式、设置
+
 ### 查找文件（支持正则表达式）
 
 `F:\Entertainment\音乐`：进入该文件夹
@@ -67,6 +75,8 @@ defaultPath=D:\Data\Share
 串
 
 ### 文件预览
+
+> 支持：空格快捷键快速预览、ESC快捷键最小化
 
 文本查看[包括：`txt`、`json` 等多种格式]
 ![alt text](.assest/image-7.png)
@@ -83,6 +93,8 @@ defaultPath=D:\Data\Share
 ### 文件下载
 
 ![alt text](.assest/image-11.png)
+
+【文件夹下载测试中……】
 
 ### 适配移动端
 

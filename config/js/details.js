@@ -11,7 +11,7 @@ function attachDetailsMethods(app) {
         } else {
         }
 
-        const isDir = (!item.size && item.size !== 0);
+        const isDir = this.isFolderItem ? this.isFolderItem(item) : (!item.size && item.size !== 0);
         const icon = this.getFileIcon(item.name, isDir);
         const fakeUrl = item.fakeUrl || this.getFileUrl(item); // Support favorites
         const ext = item.name.split('.').pop().toLowerCase();
@@ -48,7 +48,7 @@ function attachDetailsMethods(app) {
         };
 
         const locationPath = item.path || 'Root';
-        const fullPath = item.path ? `${item.path}\\${item.name}` : item.name;
+        const fullPath = this.getItemFullPath ? this.getItemFullPath(item) : (item.path ? `${item.path}\\${item.name}` : item.name);
 
         renderValue('detailLocation', locationPath);
         renderValue('detailPath', fullPath);
@@ -110,7 +110,12 @@ function attachDetailsMethods(app) {
         }
     };
 
-  app.triggerDownload = function triggerDownload(item) {
+  app.triggerDownload = async function triggerDownload(item) {
+        if (this.isFolderItem && this.isFolderItem(item)) {
+            await this.downloadFolderToDirectory(item);
+            return;
+        }
+
         const link = document.createElement('a');
         link.href = item.fakeUrl || this.getFileUrl(item);
         link.download = item.name;

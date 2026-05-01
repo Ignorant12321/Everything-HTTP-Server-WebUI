@@ -77,19 +77,6 @@
     position: relative;
 }
 
-.address-container .nav-controls {
-    margin-right: 4px;
-    padding: 0;
-    background: transparent;
-    border: none;
-    box-shadow: none;
-}
-
-.address-container .nav-controls .icon-btn {
-    width: 30px;
-    height: 30px;
-}
-
 .address-container:focus-within {
     background-color: var(--bg-surface);
     border-color: var(--accent-color);

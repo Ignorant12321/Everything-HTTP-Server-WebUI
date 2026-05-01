@@ -11,6 +11,7 @@ function attachLifecycleMethods(app) {
         this.initDragHandles();     // 初始化拖拽手柄（如侧边栏、预览面板的拖拽调整手柄）
         this.initSidebarSwipe();    // 初始化侧边栏滑动功能（如侧边栏的左滑关闭）
         this.initSubtitleHandler(); // 初始化字幕处理逻辑（用于视频字幕加载）
+        this.initKeyboardShortcuts(); // 初始化桌面键盘快捷键
 
         this.dom.address.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') this.navigateTo(this.dom.address.value.trim());

@@ -80,7 +80,7 @@
     align-items: center;
     border-bottom: 1px solid transparent;
     cursor: default;
-    transition: background-color 0.15s ease, transform 0.1s ease;
+    transition: background-color var(--theme-transition), color var(--theme-transition), border-color var(--theme-transition), transform var(--motion-fast);
     border-radius: var(--radius-sm);
     margin: 1px 4px;
 }
