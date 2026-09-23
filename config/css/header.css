@@ -164,7 +164,7 @@
 }
 
 .clear-btn {
-    display: none;
+    display: flex;
     color: var(--text-secondary);
     cursor: pointer;
     padding: 4px;
@@ -174,7 +174,12 @@
     height: 26px;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+    /* 始终占位，用透明度显隐，避免 display 切换导致布局/闪烁 */
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: scale(0.85);
+    transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease, opacity 0.15s ease, visibility 0.15s ease;
 }
 
 .clear-btn:hover {
@@ -188,7 +193,10 @@
 }
 
 .address-input:not(:placeholder-shown)+.clear-btn {
-    display: flex;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: scale(1);
 }
 
 @media (max-width: 768px) {

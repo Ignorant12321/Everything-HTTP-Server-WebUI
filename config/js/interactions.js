@@ -103,8 +103,18 @@ function attachInteractionMethods(app) {
         }
         if (input) {
             // 关掉 color/opacity 过渡，避免摘掉 input-animating 后文字从透明渐变回来闪一下
+            const revealPlaceholder = !input.value;
             input.style.transition = 'none';
             input.classList.remove('input-animating');
+            if (revealPlaceholder) {
+                input.classList.remove('placeholder-reveal');
+                void input.offsetWidth;
+                input.classList.add('placeholder-reveal');
+                clearTimeout(this._placeholderRevealTimer);
+                this._placeholderRevealTimer = setTimeout(() => {
+                    input.classList.remove('placeholder-reveal');
+                }, 200);
+            }
             void input.offsetWidth;
             input.style.transition = '';
         }
@@ -116,6 +126,8 @@ function attachInteractionMethods(app) {
         document.querySelectorAll('.flying-text-overlay').forEach((el) => el.remove());
         const input = this.dom.address;
         if (input) {
+            clearTimeout(this._placeholderRevealTimer);
+            input.classList.remove('placeholder-reveal');
             input.classList.remove('input-animating');
             const container = input.closest('.address-container');
             if (container) {

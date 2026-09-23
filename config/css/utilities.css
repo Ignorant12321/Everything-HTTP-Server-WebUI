@@ -148,6 +148,22 @@
     opacity: 0 !important;
     /* 关键：隐藏“输入路径或搜索...” */
     visibility: hidden;
+    transition: none !important;
+}
+
+/* 清空结束后 placeholder 淡入，避免硬切闪一下 */
+.address-input.placeholder-reveal::placeholder {
+    animation: placeholderReveal 0.18s ease;
+}
+
+@keyframes placeholderReveal {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 /* 1. 临时覆盖层 */
