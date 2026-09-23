@@ -1,0 +1,58 @@
+/* 自定义 tooltip：接管浏览器原生 title 提示 */
+
+:root {
+    --tooltip-bg: rgba(255, 255, 255, 0.94);
+    --tooltip-text: #1b1b1b;
+    --tooltip-border: rgba(0, 0, 0, 0.08);
+    --tooltip-shadow: 0 8px 24px rgba(0, 0, 0, 0.14), 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] {
+    --tooltip-bg: rgba(45, 45, 45, 0.94);
+    --tooltip-text: #f3f3f3;
+    --tooltip-border: rgba(255, 255, 255, 0.1);
+    --tooltip-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.app-tooltip {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 3000;
+    display: none;
+    max-width: min(320px, calc(100vw - 16px));
+    padding: 7px 14px;
+    border: 1px solid var(--tooltip-border);
+    border-radius: 10px;
+    background-color: var(--tooltip-bg);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    backdrop-filter: blur(16px) saturate(1.4);
+    color: var(--tooltip-text);
+    font-family: "Segoe UI Variable Text", "Segoe UI Variable", "Segoe UI", "Microsoft YaHei", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    text-align: center;
+    white-space: normal;
+    word-break: break-word;
+    box-shadow: var(--tooltip-shadow);
+    pointer-events: none;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-4px) scale(0.96);
+    transition: opacity 160ms cubic-bezier(0.2, 0, 0, 1), transform 160ms cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 160ms;
+}
+
+.app-tooltip.is-visible {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    transition: opacity 160ms cubic-bezier(0.2, 0, 0, 1), transform 200ms cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app-tooltip {
+        transition: none;
+    }
+}
