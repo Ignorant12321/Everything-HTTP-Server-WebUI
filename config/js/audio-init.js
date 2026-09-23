@@ -107,8 +107,10 @@ function attachAudioInitMethods(app) {
 
         const updateVolumeUI = () => {
             volumeRangeInput.value = userVolume;
+            const volPct = Math.round(userVolume * 100);
+            volumeRangeInput.style.setProperty('--vol-fill', volPct + '%');
             if (volumePercentText) {
-                volumePercentText.textContent = Math.round(userVolume * 100) + '%';
+                volumePercentText.textContent = volPct + '%';
             }
             if (userVolume === 0) {
                 volumeToggleBtn.innerHTML = svg_volume_mute;

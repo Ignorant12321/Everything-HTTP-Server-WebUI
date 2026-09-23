@@ -6,7 +6,7 @@ function attachAudioMethods(app) {
         const volumeHtml = `
             <div class="volume-wrapper" id="volumeControlArea-${file.uniqueId}">
                 <div class="volume-popup" id="volumePopupPanel-${file.uniqueId}">
-                    <div class="volume-text-display" id="volumePercent-${file.uniqueId}" style="text-align:center; color:white; font-size:12px; margin-bottom:6px;">100%</div>
+                    <div class="volume-text-display" id="volumePercent-${file.uniqueId}">100%</div>
                     
                     <input type="range" class="volume-slider-vertical" id="volumeRangeInput-${file.uniqueId}" 
                         min="0" max="1" step="0.01" value="1">
