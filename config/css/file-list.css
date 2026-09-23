@@ -8,12 +8,16 @@
     flex-direction: column;
     overflow: hidden;
     position: relative;
+    /* 列宽模板单一数据源：表头与列表行共用，由 JS 写入覆盖 */
+    --col-tpl: 40px minmax(150px, 1fr) 100px 100px 160px;
 }
 
 .grid-header {
-    display: flex;
+    display: grid;
+    grid-template-columns: var(--col-tpl);
     height: 36px;
     align-items: center;
+    padding: 0 4px;
     border-bottom: 1px solid var(--border-color);
     font-size: 12px;
     color: var(--text-secondary);
@@ -30,6 +34,7 @@
     padding: 0 10px;
     height: 100%;
     white-space: nowrap;
+    overflow: hidden;
     cursor: pointer;
     border-right: 1px solid transparent;
 }
@@ -59,7 +64,23 @@
     cursor: col-resize;
     z-index: 10;
     background: transparent;
-    transform: translateX(50%);
+    touch-action: none;
+}
+
+.resize-handle::after {
+    content: '';
+    position: absolute;
+    right: 5px;
+    top: 25%;
+    bottom: 25%;
+    width: 1px;
+    background: transparent;
+    transition: background-color 0.12s ease;
+}
+
+.resize-handle:hover::after,
+.resize-handle:active::after {
+    background: var(--accent-color);
 }
 
 #fileList {
@@ -70,14 +91,10 @@
     padding-bottom: 40px;
 }
 
-.cell-name {
-    min-width: 100px;
-}
-
 .file-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: var(--col-tpl);
     height: 40px;
-    align-items: center;
     border-bottom: 1px solid transparent;
     cursor: default;
     transition: background-color var(--theme-transition), color var(--theme-transition), border-color var(--theme-transition), transform var(--motion-fast);

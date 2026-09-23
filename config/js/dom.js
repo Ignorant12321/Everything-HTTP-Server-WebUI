@@ -4,6 +4,7 @@ function queryDom() {
         address: document.getElementById('addressInput'),       // 地址栏输入框
         list: document.getElementById('fileList'),             // 文件列表容器
         header: document.getElementById('colHeader'),          // 文件列表：列标题容器
+        filePane: document.getElementById('filePane'),         // 文件列表主面板（列宽模板变量挂载点）
         details: document.getElementById('detailsPane'),       // 详情面板
         driveList: document.getElementById('driveList'),       // 磁盘列表容器
         favList: document.getElementById('favList'),           // 收藏列表容器

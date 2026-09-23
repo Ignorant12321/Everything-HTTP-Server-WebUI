@@ -1,5 +1,8 @@
 // 文件列表模块：渲染表头、列表、网格视图和选中态。
 
+const MIN_COL_W = 50;      // 可拖动列的最小宽度(px)
+const MIN_GROW_FLOOR = 120; // 自适应列(grow)的最小宽度(px)
+
 function attachRenderListMethods(app) {
   app.buildFileIcon = function buildFileIcon(kind, label, body) {
         return `
@@ -17,53 +20,117 @@ function attachRenderListMethods(app) {
         this.state.columns.forEach((col, idx) => {
             const cell = document.createElement('div');
             cell.className = 'header-cell';
-            cell.style.width = col.width + 'px';
-            if (col.grow) cell.style.flex = '1';
+            cell.dataset.col = idx;
 
             const span = document.createElement('span');
             span.textContent = col.label;
             cell.appendChild(span);
 
             if (col.id !== 'icon') {
-                cell.onclick = () => app.sort(col.id === 'type' ? 'extension' : (col.id === 'date' ? 'date_modified' : col.id));
+                cell.onclick = () => {
+                    if (Date.now() < (this._suppressHeaderClickUntil || 0)) return;
+                    app.sort(col.id === 'type' ? 'extension' : (col.id === 'date' ? 'date_modified' : col.id));
+                };
             }
 
             if (col.resize) {
                 const handle = document.createElement('div');
                 handle.className = 'resize-handle';
-                handle.onmousedown = (e) => { e.stopPropagation(); this.startResize(e, idx); };
+                handle.onpointerdown = (e) => { e.stopPropagation(); this.startResize(e, idx); };
                 handle.onclick = (e) => e.stopPropagation();
+                handle.ondblclick = (e) => { e.stopPropagation(); this.autofitColumn(idx); };
                 cell.appendChild(handle);
             }
             this.dom.header.appendChild(cell);
         });
+        this.applyColTemplate();
     };
 
   app.startResize = function startResize(e, colIndex) {
+        if (e.button !== 0) return;
         e.preventDefault();
-        const startX = e.pageX;
-        const startWidth = this.state.columns[colIndex].width;
-        if (this.state.columns[colIndex].grow) {
-            const cell = this.dom.header.children[colIndex];
-            const rect = cell.getBoundingClientRect();
-            this.state.columns[colIndex].grow = false;
-            this.state.columns[colIndex].width = rect.width;
+        const startX = e.clientX;
+        const col = this.state.columns[colIndex];
+        let startWidth = col.width;
+        if (col.grow) {
+            const rect = this.dom.header.children[colIndex].getBoundingClientRect();
+            startWidth = Math.round(rect.width);
+            col.grow = false;
+            col.width = startWidth;
+            this.applyColTemplate();
         }
+        const handle = e.currentTarget;
         document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+        if (handle.setPointerCapture) {
+            try { handle.setPointerCapture(e.pointerId); } catch (_) { /* 忽略不支持的环境 */ }
+        }
+        let rafId = null;
         const onMove = (moveEvent) => {
-            const diff = moveEvent.pageX - startX;
-            const newWidth = Math.max(50, startWidth + diff);
-            this.state.columns[colIndex].width = newWidth;
-            this.renderHeader();
-            this.renderList();
+            if (rafId) return;
+            rafId = requestAnimationFrame(() => {
+                rafId = null;
+                const others = this.state.columns.reduce(
+                    (sum, c, i) => (i === colIndex || c.grow ? sum : sum + c.width), 0);
+                const growExists = this.state.columns.some((c, i) => i !== colIndex && c.grow);
+                const paneW = this.dom.filePane ? this.dom.filePane.clientWidth : window.innerWidth;
+                const cap = Math.max(MIN_COL_W, paneW - 8 - others - (growExists ? MIN_GROW_FLOOR : 0));
+                const wanted = startWidth + (moveEvent.clientX - startX);
+                col.width = Math.max(MIN_COL_W, Math.min(wanted, cap));
+                this.applyColTemplate();
+            });
         };
-        const onUp = () => {
+        const finish = (upEvent) => {
             document.body.style.cursor = '';
-            document.removeEventListener('mousemove', onMove);
-            document.removeEventListener('mouseup', onUp);
+            document.body.style.userSelect = '';
+            window.removeEventListener('pointermove', onMove);
+            window.removeEventListener('pointerup', finish);
+            window.removeEventListener('pointercancel', finish);
+            if (upEvent && handle.hasPointerCapture && handle.hasPointerCapture(upEvent.pointerId)) {
+                try { handle.releasePointerCapture(upEvent.pointerId); } catch (_) { /* 忽略 */ }
+            }
+            this._suppressHeaderClickUntil = Date.now() + 120;
         };
-        document.addEventListener('mousemove', onMove);
-        document.addEventListener('mouseup', onUp);
+        window.addEventListener('pointermove', onMove);
+        window.addEventListener('pointerup', finish);
+        window.addEventListener('pointercancel', finish);
+  };
+
+  app.applyColTemplate = function applyColTemplate() {
+        const cols = this.state.columns;
+        const hasGrow = cols.some(c => c.grow);
+        const tpl = cols
+            .map(c => (c.grow ? `minmax(${MIN_GROW_FLOOR}px, 1fr)` : `${Math.round(c.width)}px`))
+            .join(' ') + (hasGrow ? '' : ' 1fr');
+        this.dom.filePane.style.setProperty('--col-tpl', tpl);
+  };
+
+  app.autofitColumn = function autofitColumn(colIndex) {
+        const col = this.state.columns[colIndex];
+        if (!col || !col.resize) return;
+        const probe = document.createElement('span');
+        probe.style.cssText = 'position:absolute;left:-9999px;top:0;visibility:hidden;white-space:pre';
+        document.body.appendChild(probe);
+        let max = 0;
+        const measure = (el) => {
+            const cs = getComputedStyle(el);
+            probe.style.fontFamily = cs.fontFamily;
+            probe.style.fontSize = cs.fontSize;
+            probe.style.fontWeight = cs.fontWeight;
+            probe.textContent = el.textContent;
+            max = Math.max(max, probe.scrollWidth);
+        };
+        this.dom.list.querySelectorAll(`[data-col="${colIndex}"]`).forEach(measure);
+        const headerCell = this.dom.header.children[colIndex];
+        if (headerCell) measure(headerCell);
+        probe.remove();
+        col.grow = false;
+        const others = this.state.columns.reduce(
+            (sum, c, i) => (i === colIndex || c.grow ? sum : sum + c.width), 0);
+        const paneW = this.dom.filePane ? this.dom.filePane.clientWidth : window.innerWidth;
+        const cap = Math.max(MIN_COL_W, paneW - 8 - others);
+        col.width = Math.max(MIN_COL_W, Math.min(Math.ceil(max) + 22, cap));
+        this.applyColTemplate();
   };
 
   app.renderList = function renderList() {
@@ -146,11 +213,11 @@ function attachRenderListMethods(app) {
                 div.innerHTML = `<div class="cell-icon">${icon}</div><div class="cell-name" title="${item.name}">${item.name}</div>`;
             } else {
                 div.innerHTML = `
-                            <div class="cell" style="width:${this.state.columns[0].width}px"><span class="cell-icon" style="font-size:18px">${icon}</span></div>
-                            <div class="cell cell-name" style="width:${this.state.columns[1].width}px; ${this.state.columns[1].grow ? 'flex:1' : ''}">${item.name}</div>
-                            <div class="cell cell-type" style="width:${this.state.columns[2].width}px">${ext}</div>
-                            <div class="cell cell-meta" style="width:${this.state.columns[3].width}px">${sizeStr}</div>
-                            <div class="cell cell-meta" style="width:${this.state.columns[4].width}px">${dateStr}</div>
+                            <div class="cell" data-col="0"><span class="cell-icon" style="font-size:18px">${icon}</span></div>
+                            <div class="cell cell-name" data-col="1">${item.name}</div>
+                            <div class="cell cell-type" data-col="2">${ext}</div>
+                            <div class="cell cell-meta" data-col="3">${sizeStr}</div>
+                            <div class="cell cell-meta" data-col="4">${dateStr}</div>
                         `;
             }
             list.appendChild(div);
