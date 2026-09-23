@@ -139,6 +139,9 @@
 .input-animating {
     color: transparent !important;
     /* 隐藏光标和可能残留的文字 */
+    -webkit-text-fill-color: transparent;
+    /* 动画期间不要 color/opacity 过渡，避免闪烁 */
+    transition: none !important;
 }
 
 .input-animating::placeholder {
@@ -176,6 +179,24 @@
     100% {
         transform: translate3d(8px, 0, 0) scaleX(0.96);
         opacity: 0;
+    }
+}
+
+/* 失焦后路径飞回：与 clearTextAway 反向入场 */
+.flying-text-overlay.path-restore-overlay {
+    transform-origin: left center;
+    animation: pathRestoreIn 0.26s cubic-bezier(0.2, 0, 0, 1) forwards;
+}
+
+@keyframes pathRestoreIn {
+    0% {
+        transform: translate3d(-8px, 0, 0) scaleX(0.97);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translate3d(0, 0, 0) scaleX(1);
+        opacity: 1;
     }
 }
 

@@ -10,6 +10,8 @@ function attachInteractionMethods(app) {
         const text = input.value;
         if (!text) return;
 
+        this.cancelAddressFx();
+
         const rect = input.getBoundingClientRect();
         const computedStyle = window.getComputedStyle(input);
         const addressContainer = input.closest('.address-container');
@@ -35,11 +37,96 @@ function attachInteractionMethods(app) {
         input.value = '';
         input.focus();
 
-        setTimeout(() => {
-            overlay.remove();
+        this._addrClearOverlay = overlay;
+        this._addrClearContainer = addressContainer;
+        clearTimeout(this._addrClearTimer);
+        this._addrClearTimer = setTimeout(() => this.endAddressFx(), 220);
+    };
+
+  app.animatePathRestore = function animatePathRestore() {
+        const input = this.dom.address;
+        if (!input || input.value) return;
+        const path = this.state.currentPath;
+        if (!path) return;
+
+        this.cancelAddressFx();
+
+        const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduced) {
+            input.value = path;
+            return;
+        }
+
+        const rect = input.getBoundingClientRect();
+        const computedStyle = window.getComputedStyle(input);
+        const addressContainer = input.closest('.address-container');
+
+        const overlay = document.createElement('div');
+        overlay.className = 'flying-text-overlay path-restore-overlay';
+        overlay.style.left = rect.left + 'px';
+        overlay.style.top = rect.top + 'px';
+        overlay.style.width = rect.width + 'px';
+        overlay.style.height = rect.height + 'px';
+        overlay.style.fontFamily = computedStyle.fontFamily;
+        overlay.style.fontSize = computedStyle.fontSize;
+        overlay.style.paddingLeft = computedStyle.paddingLeft;
+        overlay.style.color = computedStyle.color;
+        overlay.textContent = path;
+        document.body.appendChild(overlay);
+
+        input.classList.add('input-animating');
+        if (addressContainer) addressContainer.classList.add('is-restoring');
+        input.value = path;
+
+        this._addrClearOverlay = overlay;
+        this._addrClearContainer = addressContainer;
+        clearTimeout(this._addrClearTimer);
+        this._addrClearTimer = setTimeout(() => this.endAddressFx(), 260);
+    };
+
+  app.endAddressFx = function endAddressFx() {
+        clearTimeout(this._addrClearTimer);
+        this._addrClearTimer = null;
+
+        const input = this.dom.address;
+        const container = this._addrClearContainer || (input && input.closest('.address-container'));
+        const overlay = this._addrClearOverlay;
+        this._addrClearOverlay = null;
+        this._addrClearContainer = null;
+        this._pathRestoreOverlay = null;
+        this._pathRestoreContainer = null;
+
+        if (overlay) overlay.remove();
+        if (container) {
+            container.classList.remove('is-clearing');
+            container.classList.remove('is-restoring');
+        }
+        if (input) {
+            // 关掉 color/opacity 过渡，避免摘掉 input-animating 后文字从透明渐变回来闪一下
+            input.style.transition = 'none';
             input.classList.remove('input-animating');
-            if (addressContainer) addressContainer.classList.remove('is-clearing');
-        }, 220);
+            void input.offsetWidth;
+            input.style.transition = '';
+        }
+    };
+
+  app.cancelAddressFx = function cancelAddressFx() {
+        this.endAddressFx();
+        // 清掉可能残留的其它 flying overlay（历史竞态）
+        document.querySelectorAll('.flying-text-overlay').forEach((el) => el.remove());
+        const input = this.dom.address;
+        if (input) {
+            input.classList.remove('input-animating');
+            const container = input.closest('.address-container');
+            if (container) {
+                container.classList.remove('is-clearing');
+                container.classList.remove('is-restoring');
+            }
+        }
+    };
+
+  app.finishPathRestore = function finishPathRestore() {
+        this.endAddressFx();
     };
 
   app.toggleViewMenu = function toggleViewMenu(e) {

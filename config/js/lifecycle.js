@@ -21,6 +21,14 @@ function attachLifecycleMethods(app) {
             this.animateClear();
         });
 
+        this.dom.address.addEventListener('blur', () => {
+            this.animatePathRestore();
+        });
+
+        this.dom.address.addEventListener('focus', () => {
+            this.finishPathRestore();
+        });
+
         document.getElementById('btnPreview').addEventListener('click', () => {
             if (this.state.selectedItem) this.handleOpenAction(this.state.selectedItem);
         });

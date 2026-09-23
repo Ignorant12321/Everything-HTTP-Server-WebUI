@@ -146,6 +146,10 @@
     animation: clearUnderlineSweep 0.22s cubic-bezier(0.2, 0, 0, 1);
 }
 
+.address-container.is-restoring::after {
+    animation: clearUnderlineSweep 0.26s cubic-bezier(0.2, 0, 0, 1);
+}
+
 .address-input {
     flex: 1;
     border: none;
