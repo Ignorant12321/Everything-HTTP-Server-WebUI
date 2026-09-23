@@ -12,6 +12,11 @@ function attachInteractionMethods(app) {
 
         this.cancelAddressFx();
 
+        // 先 focus：若输入框原本未聚焦，focus 会在动画状态挂上之前同步触发
+        // finishPathRestore → endAddressFx；放到 setup 之前可避免拆掉刚建好的动画，
+        // 否则 220ms 定时器会二次触发 endAddressFx，placeholder 从 1 掉回 0 再淡入一次（闪烁）
+        input.focus();
+
         const rect = input.getBoundingClientRect();
         const computedStyle = window.getComputedStyle(input);
         const addressContainer = input.closest('.address-container');
@@ -35,7 +40,6 @@ function attachInteractionMethods(app) {
         if (addressContainer) addressContainer.classList.add('is-clearing');
 
         input.value = '';
-        input.focus();
 
         this._addrClearOverlay = overlay;
         this._addrClearContainer = addressContainer;

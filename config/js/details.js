@@ -4,11 +4,13 @@ function attachDetailsMethods(app) {
 
   app.renderDetails = function renderDetails(item) {
         const pane = this.dom.details;
-        if (!item) { pane.classList.remove('active'); pane.style.transform = ''; return; }
+        if (!item) { this.closeDetails(); return; }
 
         if (window.innerWidth > 768) {
+            const opening = !pane.classList.contains('active');
             pane.classList.add('active');
-        } else {
+            // display:none → flex 不会播 transform，需强制从偏移帧进入
+            if (opening && this.animateDetailsOpen) this.animateDetailsOpen(pane);
         }
 
         const isDir = this.isFolderItem ? this.isFolderItem(item) : (!item.size && item.size !== 0);
@@ -60,9 +62,45 @@ function attachDetailsMethods(app) {
         renderValue('detailSize', isDir ? '-' : this.formatSize(item.size));
     };
 
+  app.animateDetailsOpen = function animateDetailsOpen(pane) {
+        const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduced) return;
+        pane.style.transition = 'none';
+        pane.style.opacity = '0';
+        pane.style.transform = 'translateX(18px)';
+        void pane.offsetWidth;
+        pane.style.transition = '';
+        pane.style.opacity = '';
+        pane.style.transform = '';
+    };
+
   app.closeDetails = function closeDetails() {
-        this.dom.details.classList.remove('active');
-        this.dom.details.style.transform = '';
+        const pane = this.dom.details;
+        if (!pane.classList.contains('active')) {
+            pane.style.transform = '';
+            pane.style.opacity = '';
+            pane.style.transition = '';
+            return;
+        }
+        const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduced || window.innerWidth <= 768) {
+            pane.classList.remove('active');
+            pane.style.transform = '';
+            pane.style.opacity = '';
+            pane.style.transition = '';
+            return;
+        }
+        // 桌面端先滑出再撤 active，避免 display:none 硬切
+        pane.style.transition = 'transform 0.22s cubic-bezier(0.2, 0, 0, 1), opacity 0.22s cubic-bezier(0.2, 0, 0, 1)';
+        pane.style.opacity = '0';
+        pane.style.transform = 'translateX(18px)';
+        clearTimeout(this._detailsCloseTimer);
+        this._detailsCloseTimer = setTimeout(() => {
+            pane.classList.remove('active');
+            pane.style.transform = '';
+            pane.style.opacity = '';
+            pane.style.transition = '';
+        }, 220);
     };
 
   app.copyText = function copyText(text) {

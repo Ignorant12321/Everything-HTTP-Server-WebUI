@@ -1,10 +1,9 @@
 /* 通用工具：回退提示、toast、清空输入动画和通用动效。 */
 
-/* 统一主题切换节奏，避免局部组件先黑先白。 */
+/* 统一主题切换节奏，避免局部组件先黑先白。（.icon-btn/.details-pane 的 transition 在各自文件，避免被覆盖） */
 .app-header,
 .address-container,
 .address-input,
-.icon-btn,
 .clear-btn,
 .sidebar,
 .sidebar-item,
@@ -20,7 +19,6 @@
 .cell-name,
 .cell-meta,
 .cell-type,
-.details-pane,
 .preview-box,
 .action-btn,
 .info-label,
@@ -32,6 +30,12 @@
 .flyout-menu,
 .menu-item {
     transition: background-color var(--theme-transition), color var(--theme-transition), border-color var(--theme-transition), fill var(--theme-transition), box-shadow var(--theme-transition), opacity var(--theme-transition), transform var(--motion-fast);
+}
+
+/* 单独给清空按钮补回 visibility：上面公共 transition 会覆盖 header.css 的
+   visibility 0.15s，导致动画结束时按钮瞬间消失而不是随 opacity 渐隐 */
+.clear-btn {
+    transition: background-color var(--theme-transition), color var(--theme-transition), border-color var(--theme-transition), fill var(--theme-transition), box-shadow var(--theme-transition), opacity var(--theme-transition), visibility var(--theme-transition), transform var(--motion-fast);
 }
 
 .menu-caption {

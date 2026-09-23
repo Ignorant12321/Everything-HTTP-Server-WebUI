@@ -30,7 +30,12 @@ function attachApiMethods(app) {
     };
 
   app.fetchData = async function fetchData(isExplicitFolder) {
-        this.dom.list.innerHTML = `<div class="center-msg"><svg class="loading-icon" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><use href="#icon-spinner"></use></svg><span>加载中...</span></div>`;
+        const list = this.dom.list;
+        // 快返回时不闪“加载中”，慢请求再替换，避免内容→spinner→内容 的一闪
+        clearTimeout(this._fetchLoadingTimer);
+        this._fetchLoadingTimer = setTimeout(() => {
+            list.innerHTML = `<div class="center-msg"><svg class="loading-icon" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><use href="#icon-spinner"></use></svg><span>加载中...</span></div>`;
+        }, 160);
         try {
             if (window.location.protocol === 'file:' || window.location.protocol === 'blob:') throw new Error('DEMO');
 
@@ -67,13 +72,15 @@ function attachApiMethods(app) {
 
             const res = await fetch(`/?${params}`);
             const data = await res.json();
+            clearTimeout(this._fetchLoadingTimer);
             this.state.items = data.results || [];
             this.state.total = parseInt(data.totalResults) || 0;
             this.renderList();
             this.updatePagination();
         } catch (e) {
+            clearTimeout(this._fetchLoadingTimer);
             if (e.message === 'DEMO') this.mockData();
-            else this.dom.list.innerHTML = `<div class="center-msg" style="color:red">连接失败</div>`;
+            else list.innerHTML = `<div class="center-msg" style="color:red">连接失败</div>`;
         }
     };
 

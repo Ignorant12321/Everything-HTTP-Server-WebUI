@@ -23,6 +23,8 @@ function attachNavigationMethods(app) {
         this.state.currentPath = path;
         this.state.offset = 0;
         this.dom.address.value = path;
+        // 导航覆写地址时结束清空/飞回动画，避免 input-animating 让路径透明不可见
+        if (this.endAddressFx) this.endAddressFx();
         this.state.selectedItem = null;
         this.renderDetails(null);
         document.getElementById('btnBack').disabled = this.state.historyIndex <= 0;
