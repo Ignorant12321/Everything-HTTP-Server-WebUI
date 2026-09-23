@@ -15,7 +15,7 @@ function createState() {
         isPinned: false,                 // 是否锁定。不允许拖动播放器
         viewMode: localStorage.getItem('viewMode') || 'list', // 视图模式：list(列表)/grid(网格)，优先读取本地存储
         showHidden: localStorage.getItem('showHidden') === 'true', // 是否显示隐藏文件/文件夹
-        enableCopy: localStorage.getItem('enableCopy') !== 'false', // 是否启用文件复制功能
+        enableCopy: localStorage.getItem('enableCopy') === 'true', // 是否启用文件复制功能
         openMethod: localStorage.getItem('openMethod') || 'overlay', // 文件打开方式：overlay(浮层)/newtab(新标签)
         theme: localStorage.getItem('theme') || 'light', // 主题模式：light(亮色)/dark(暗色)
         isNavigatingHistory: false,    // 是否正在执行历史记录导航（前进/后退），用于防止重复操作
