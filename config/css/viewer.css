@@ -5,32 +5,38 @@
    修改：预览模态框与动画核心样式
    ########## */
 
-/* 1. 模态框基础：不再使用 display:none，而是使用 visibility/opacity 以支持动画 */
+/* 1. 模态框：容器不参与 opacity 动画（避免 backdrop-filter 工具栏闪烁），遮罩用 ::before 淡入 */
 .viewer-modal {
     position: fixed;
     inset: 0;
     z-index: 1000;
     display: flex;
-    /* 始终保持 flex 布局 */
     flex-direction: column;
-
-    /* 默认背景：深色遮罩（用于视频/图片） */
-    background: rgba(0, 0, 0, 0.75);
-
-    /* 动画过渡属性 */
-    opacity: 0;
+    background: transparent;
     visibility: hidden;
     pointer-events: none;
-    /* 隐藏时不阻挡点击 */
-    transition: background-color 0.4s ease, opacity 0.3s ease, visibility 0.3s;
+    transition: visibility 0.3s;
+}
+
+.viewer-modal::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: rgba(0, 0, 0, 0.75);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, background-color 0.4s ease;
 }
 
 /* 2. 打开状态 */
 .viewer-modal.open {
-    opacity: 1;
     visibility: visible;
     pointer-events: auto;
-    /* 恢复交互 */
+}
+
+.viewer-modal.open::before {
+    opacity: 1;
 }
 
 /* 3. 音乐模式：背景透明 */
@@ -38,6 +44,11 @@
     background: transparent !important;
     backdrop-filter: none;
     pointer-events: none !important;
+}
+
+.viewer-modal.music-mode::before {
+    opacity: 0 !important;
+    background: transparent;
 }
 
 .viewer-modal.music-mode .viewer-content,
@@ -101,6 +112,7 @@
     justify-content: center;
     overflow: hidden;
     position: relative;
+    z-index: 1;
 
     /* 动画基点：底部中心 */
     transform-origin: bottom center;
@@ -122,10 +134,13 @@
 /* 当添加 .minimized 类时 */
 .viewer-modal.minimized {
     /* 背景立即透明，且允许点击穿透到底部列表 */
-    background-color: transparent !important;
     pointer-events: none;
-    /* 稍微延迟一点隐藏 visibility，保证动画播完 */
     transition-delay: 0s;
+}
+
+.viewer-modal.minimized::before {
+    opacity: 0;
+    background-color: transparent;
 }
 
 /* A. 工具栏动画：向上滑出屏幕 */

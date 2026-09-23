@@ -51,72 +51,74 @@ function attachViewerMethods(app) {
         this.dom.viewerOpenBtn.href = file.url;
 
         modal.classList.remove('minimized');
-        modal.classList.add('open');
 
         const allFiles = contentContainer.querySelectorAll('.file-container');
         allFiles.forEach(el => el.classList.remove('active'));
 
         let currentFileContainer = document.getElementById(file.uniqueId);
 
-        if (currentFileContainer) {
-            currentFileContainer.classList.add('active');
-            return;
+        if (!currentFileContainer) {
+            const newContainer = document.createElement('div');
+            newContainer.id = file.uniqueId;
+            newContainer.className = 'file-container active';
+            contentContainer.appendChild(newContainer);
+
+            if (file.type !== 'audio') {
+                newContainer.innerHTML = '<div style="color:white">加载中...</div>';
+            }
+
+            try {
+                if (file.type === 'img') {
+                    newContainer.innerHTML = `
+                                <div class="image-viewer-container" onwheel="app.zoomImage(event)" onmousedown="app.startDragImage(event)">
+                                    <img id="viewerImage-${file.uniqueId}" src="${file.url}" style="transform: translate(0px, 0px) scale(1);">
+                                </div>
+                            `;
+                } else if (file.type === 'audio') {
+                    newContainer.innerHTML = this.buildAudioPlayerHTML(file);
+                    this.initAudioPlayer(newContainer, file);
+
+                } else if (file.type === 'video') {
+                    let hevcWarning = '';
+                    if (file.ext === 'mkv' || file.ext === 'mp4') {
+                    }
+
+                    newContainer.innerHTML = `
+        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%; position:relative;">
+            <video id="video-${file.uniqueId}" controls autoplay crossorigin="anonymous" src="${file.url}" style="width:100%;height:auto;max-height:85vh; outline:none; background:black;">
+            </video>
+            ${hevcWarning}
+        </div>`;
+
+                    this.findAndLoadSubtitles(file, newContainer);
+
+                } else if (file.type === 'txt') {
+                    if (!file.content) {
+                        const res = await fetch(file.url);
+                        file.content = await res.text();
+                    }
+                    newContainer.innerHTML = `<div class="viewer-text">${file.content.replace(/</g, '&lt;')}</div>`;
+                } else if (file.type === 'pdf') {
+                    newContainer.innerHTML = `<iframe src="${file.url}" class="viewer-iframe"></iframe>`;
+                } else {
+                    newContainer.innerHTML = `
+                                <div class="fallback-msg">
+                                    ${this.getFileIcon(file.name, false)}
+                                    <div>此文件类型 (${file.ext}) 不支持预览</div>
+                                    <div class="fallback-actions">
+                                        <a class="fallback-link fallback-download" href="${file.url}" download="${file.name}">立即下载</a>
+                                        <a class="fallback-link fallback-open" href="${file.url}" target="_blank">在新窗口打开</a>
+                                        <button class="fallback-link fallback-cancel" type="button" onclick="app.closeFile(app.state.activeFileIndex, event)">取消</button>
+                                    </div>
+                                </div>`;
+                }
+            } catch (e) { newContainer.innerHTML = `<div style="color:red">加载失败: ${e.message}</div>`; }
+            currentFileContainer = newContainer;
         }
 
-        const newContainer = document.createElement('div');
-        newContainer.id = file.uniqueId;
-        newContainer.className = 'file-container active';
-        contentContainer.appendChild(newContainer);
-
-        newContainer.innerHTML = '<div style="color:white">加载中...</div>';
-
-        try {
-            if (file.type === 'img') {
-                newContainer.innerHTML = `
-                            <div class="image-viewer-container" onwheel="app.zoomImage(event)" onmousedown="app.startDragImage(event)">
-                                <img id="viewerImage-${file.uniqueId}" src="${file.url}" style="transform: translate(0px, 0px) scale(1);">
-                            </div>
-                        `;
-            } else if (file.type === 'audio') {
-                newContainer.innerHTML = this.buildAudioPlayerHTML(file);
-                this.initAudioPlayer(newContainer, file);
-
-            } else if (file.type === 'video') {
-                let hevcWarning = '';
-                if (file.ext === 'mkv' || file.ext === 'mp4') {
-                }
-
-                newContainer.innerHTML = `
-    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%; position:relative;">
-        <video id="video-${file.uniqueId}" controls autoplay crossorigin="anonymous" src="${file.url}" style="width:100%;height:auto;max-height:85vh; outline:none; background:black;">
-        </video>
-        ${hevcWarning}
-    </div>`;
-
-                this.findAndLoadSubtitles(file, newContainer);
-
-            } else if (file.type === 'txt') {
-                if (!file.content) {
-                    const res = await fetch(file.url);
-                    file.content = await res.text();
-                }
-                newContainer.innerHTML = `<div class="viewer-text">${file.content.replace(/</g, '&lt;')}</div>`;
-            } else if (file.type === 'pdf') {
-                newContainer.innerHTML = `<iframe src="${file.url}" class="viewer-iframe"></iframe>`;
-            } else {
-                newContainer.innerHTML = `
-                            <div class="fallback-msg">
-                                ${this.getFileIcon(file.name, false)}
-                                <div>此文件类型 (${file.ext}) 不支持预览</div>
-                                <div class="fallback-actions">
-                                    <a class="fallback-link fallback-download" href="${file.url}" download="${file.name}">立即下载</a>
-                                    <a class="fallback-link fallback-open" href="${file.url}" target="_blank">在新窗口打开</a>
-                                    <button class="fallback-link fallback-cancel" type="button" onclick="app.closeFile(app.state.activeFileIndex, event)">取消</button>
-                                </div>
-                            </div>`;
-            }
-        } catch (e) { newContainer.innerHTML = `<div style="color:red">加载失败: ${e.message}</div>`; }
-  };
+        currentFileContainer.classList.add('active');
+        modal.classList.add('open');
+    };
 
   app.minimizeViewer = function minimizeViewer() {
         this.dom.viewerModal.classList.add('minimized');
