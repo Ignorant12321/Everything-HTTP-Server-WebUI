@@ -26,7 +26,7 @@
         transform: translateY(var(--audio-cover-lift-mobile));
     }
 
-    .audio-cover-img,
+    .audio-cover-frame,
     .audio-cover-placeholder {
         width: 140px;
         height: 140px;
@@ -66,7 +66,7 @@
         --audio-cover-lift-desktop: -8px;
     }
 
-    .audio-cover-img,
+    .audio-cover-frame,
     .audio-cover-placeholder {
         width: 100px;
         height: 100px;
@@ -85,8 +85,15 @@
     }
 }
 
-.audio-cover-img.playing {
-    animation: spin 10s linear infinite;
+.audio-cover-frame,
+.audio-cover-frame.playing {
+    transition:
+        opacity 0.55s ease 0.12s,
+        border-radius 0.6s cubic-bezier(0.34, 1.4, 0.64, 1) 0.18s,
+        box-shadow 0.4s ease 0.08s;
+}
+
+.audio-cover-frame.playing {
     border-radius: 50%;
 }
 
@@ -142,7 +149,8 @@
     align-items: center;
 }
 
-.audio-lyrics-section {
+.audio-lyrics-section,
+.audio-section-lyrics {
     flex: 1;
     padding: 20px;
     overflow-y: auto;
@@ -150,7 +158,8 @@
     color: rgba(255, 255, 255, 0.5);
     font-size: 15px;
     line-height: 2;
-    scroll-behavior: smooth;
+    /* 滚动由 JS rAF 驱动，避免与 scrollIntoView 抢控制 */
+    scroll-behavior: auto;
     position: relative;
     /* 蒙版效果 */
     mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
@@ -158,19 +167,27 @@
 }
 
 .lyric-line {
-    transition: all 0.3s;
+    transition:
+        color 0.4s ease,
+        opacity 0.42s ease,
+        transform 0.48s cubic-bezier(0.33, 1, 0.68, 1),
+        text-shadow 0.4s ease,
+        filter 0.4s ease;
     cursor: pointer;
     padding: 4px 0;
     white-space: pre-wrap;
-    /* 允许换行 */
+    opacity: 0.42;
+    transform: scale(1);
+    transform-origin: center center;
+    will-change: opacity, transform, color;
 }
 
 .lyric-line.active {
-    color: white;
-    font-size: 18px;
-    font-weight: bold;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-    transform: scale(1.05);
+    color: #fff;
+    opacity: 1;
+    font-weight: 600;
+    transform: scale(1.06);
+    text-shadow: 0 0 12px rgba(255, 255, 255, 0.45);
 }
 
 /* 视频字幕选择器样式 */
@@ -216,7 +233,7 @@
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .audio-cover-img {
+    .audio-cover-frame {
         width: 120px;
         height: 120px;
         margin-bottom: 10px;

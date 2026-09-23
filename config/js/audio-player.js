@@ -22,8 +22,10 @@ function attachAudioMethods(app) {
             <canvas class="audio-visualizer" id="visualizer-${file.uniqueId}"></canvas>
 
             <div class="audio-section-info">
-                <img src="" id="audioCover-${file.uniqueId}" class="audio-cover-img" style="opacity:0" crossorigin="anonymous">
-                <div id="audioPlaceholder-${file.uniqueId}" class="audio-cover-placeholder">🎵</div>
+                <div class="audio-cover-frame">
+                    <img src="" id="audioCover-${file.uniqueId}" class="audio-cover-img" crossorigin="anonymous">
+                </div>
+                <div id="audioPlaceholder-${file.uniqueId}" class="audio-cover-placeholder"><svg width="72" height="72" fill="currentColor" viewBox="0 0 16 16"><use href="#icon-music"></use></svg></div>
                 <div class="audio-meta">
                     <div class="audio-title" id="audioTitle-${file.uniqueId}">${file.name}</div>
                     <div class="audio-artist" id="audioArtist-${file.uniqueId}">Unknown Artist</div>
@@ -46,7 +48,7 @@ function attachAudioMethods(app) {
                 <div class="audio-btn-row">
                     <button class="icon-btn" onclick="app.toggleFullScreen('${file.uniqueId}')" id="fsBtn-${file.uniqueId}" title="全屏" style="color:inherit;opacity:0.8">${svg_fullscreen}</button>
                     <button class="icon-btn" onclick="app.toggleLoop('${file.uniqueId}')" id="loopBtn-${file.uniqueId}" title="切换循环模式" style="color:inherit;opacity:0.8">${svg_loop_single}</button>
-                    <button class="icon-btn play-btn" id="playBtn-${file.uniqueId}">${svg_play}</button>
+                    <button class="icon-btn play-btn" id="playBtn-${file.uniqueId}" title="播放" aria-pressed="false">${svg_play_pause}</button>
                     
                     ${volumeHtml} <button class="icon-btn" onclick="app.togglePin('${file.uniqueId}')" id="pinBtn-${file.uniqueId}" title="固定并穿透" style="color:inherit;opacity:0.8;width:30px;">
                     <svg width="18" height="18" fill="currentColor"><use href="#icon-pin-off"></use></svg>
@@ -57,6 +59,13 @@ function attachAudioMethods(app) {
         <audio id="audioEl-${file.uniqueId}" src="${file.url}" crossorigin="anonymous" style="display:none"></audio>
         `;
   };
+
+  app.setPlayBtnState = function setPlayBtnState(btn, playing) {
+        if (!btn) return;
+        btn.classList.toggle('is-playing', !!playing);
+        btn.setAttribute('aria-pressed', playing ? 'true' : 'false');
+        btn.title = playing ? '暂停' : '播放';
+    };
 
   app.playNextInFavorites = function playNextInFavorites(currentFile, isShuffle) {
         const allFavs = this.state.favorites;

@@ -2,6 +2,9 @@
 
 function attachAudioLyricsMethods(app) {
 
+  let lyricScrollRaf = 0;
+  let lyricHlTimer = 0;
+
   app.parseLrc = function parseLrc(text) {
         const lines = text.split('\n');
         let result = [];
@@ -41,12 +44,42 @@ function attachAudioLyricsMethods(app) {
     };
 
   app.renderLyrics = function renderLyrics(container, data, uid) {
-        let html = '<div style="height:50%"></div>'; // Padding top
+        let html = '<div class="lyric-pad" style="height:50%"></div>';
         data.forEach((line, i) => {
             html += `<div class="lyric-line" id="lyric-${uid}-${i}" onclick="app.seekToLyric(${line.time}, '${uid}')">${line.content}</div>`;
         });
-        html += '<div style="height:50%"></div>'; // Padding bottom
+        html += '<div class="lyric-pad" style="height:50%"></div>';
         container.innerHTML = html;
+        container.scrollTop = 0;
+        if (lyricScrollRaf) cancelAnimationFrame(lyricScrollRaf);
+        lyricScrollRaf = 0;
+  };
+
+  app.scrollLyricsToCenter = function scrollLyricsToCenter(container, line) {
+        if (!container || !line) return;
+        const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const target = Math.max(0, line.offsetTop - container.clientHeight / 2 + line.offsetHeight / 2);
+        if (reduced) {
+            container.scrollTop = target;
+            return;
+        }
+        if (lyricScrollRaf) cancelAnimationFrame(lyricScrollRaf);
+        const start = container.scrollTop;
+        const delta = target - start;
+        if (Math.abs(delta) < 0.5) return;
+        const duration = 480;
+        const t0 = performance.now();
+        const ease = (t) => 1 - Math.pow(1 - t, 3);
+        const step = (now) => {
+            const p = Math.min(1, (now - t0) / duration);
+            container.scrollTop = start + delta * ease(p);
+            if (p < 1) {
+                lyricScrollRaf = requestAnimationFrame(step);
+            } else {
+                lyricScrollRaf = 0;
+            }
+        };
+        lyricScrollRaf = requestAnimationFrame(step);
   };
 
   app.syncLyrics = function syncLyrics(container, data, time, uid) {
@@ -56,19 +89,24 @@ function attachAudioLyricsMethods(app) {
             else break;
         }
 
-        if (activeIndex !== -1) {
-            const lines = container.querySelectorAll('.lyric-line');
-            const currentActive = container.querySelector('.lyric-line.active');
-            const newActive = document.getElementById(`lyric-${uid}-${activeIndex}`);
+        if (activeIndex === -1) return;
 
-            if (currentActive !== newActive) {
-                if (currentActive) currentActive.classList.remove('active');
-                if (newActive) {
-                    newActive.classList.add('active');
-                    newActive.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-            }
-        }
+        const currentActive = container.querySelector('.lyric-line.active');
+        const newActive = document.getElementById(`lyric-${uid}-${activeIndex}`);
+        if (!newActive || currentActive === newActive) return;
+
+        // 旧句先淡出，滚动立刻跟上，新句稍后再亮起
+        if (currentActive) currentActive.classList.remove('active');
+        app.scrollLyricsToCenter(container, newActive);
+
+        const pendingId = newActive.id;
+        clearTimeout(lyricHlTimer);
+        lyricHlTimer = setTimeout(() => {
+            const el = document.getElementById(pendingId);
+            if (!el) return;
+            container.querySelectorAll('.lyric-line.active').forEach((n) => n.classList.remove('active'));
+            el.classList.add('active');
+        }, 90);
     };
 
   app.seekToLyric = function seekToLyric(time, uid) {

@@ -5,6 +5,7 @@ function attachAudioInitMethods(app) {
         const progressArea = document.getElementById(`audioProgressArea-${file.uniqueId}`), curTimeEl = document.getElementById(`curTime-${file.uniqueId}`), durTimeEl = document.getElementById(`durTime-${file.uniqueId}`);
         const lyricsBox = document.getElementById(`lyricsBox-${file.uniqueId}`), titleEl = document.getElementById(`audioTitle-${file.uniqueId}`), artistEl = document.getElementById(`audioArtist-${file.uniqueId}`);
         const coverImg = document.getElementById(`audioCover-${file.uniqueId}`), coverPh = document.getElementById(`audioPlaceholder-${file.uniqueId}`), loopBtn = document.getElementById(`loopBtn-${file.uniqueId}`);
+        const coverFrame = coverImg ? coverImg.closest('.audio-cover-frame') : null;
         const volumePopupPanel = document.getElementById(`volumePopupPanel-${file.uniqueId}`), volumeRangeInput = document.getElementById(`volumeRangeInput-${file.uniqueId}`), volumeToggleBtn = document.getElementById(`volumeToggleBtn-${file.uniqueId}`);
         const volumePercentText = document.getElementById(`volumePercent-${file.uniqueId}`), bgLayer = document.getElementById(`audioBg-${file.uniqueId}`), playerContainer = document.getElementById(`audioContainer-${file.uniqueId}`);
         const canvas = document.getElementById(`visualizer-${file.uniqueId}`);
@@ -46,8 +47,10 @@ function attachAudioInitMethods(app) {
             const ctx = canvas.getContext('2d');
             const draw = () => {
                 animationId = requestAnimationFrame(draw);
-                canvas.width = canvas.offsetWidth;
-                canvas.height = canvas.offsetHeight;
+                const cw = canvas.offsetWidth;
+                const ch = canvas.offsetHeight;
+                if (canvas.width !== cw) canvas.width = cw;
+                if (canvas.height !== ch) canvas.height = ch;
                 const width = canvas.width;
                 const height = canvas.height;
                 analyser.getByteFrequencyData(dataArray);
@@ -79,7 +82,7 @@ function attachAudioInitMethods(app) {
                             let base64String = "";
                             for (let i = 0; i < data.length; i++) base64String += String.fromCharCode(data[i]);
                             coverImg.src = `data:${format};base64,${window.btoa(base64String)}`;
-                            coverImg.style.opacity = 1;
+                            if (coverFrame) coverFrame.classList.add('has-art');
                             coverPh.style.display = 'none';
                         }
                     },
@@ -93,15 +96,21 @@ function attachAudioInitMethods(app) {
                 lyricsData = this.parseLrc(text);
                 this.renderLyrics(lyricsBox, lyricsData, file.uniqueId);
             }).catch(() => { lyricsBox.innerHTML = '<div style="margin-top:50%;">暂无歌词</div>'; });
-        audio.volume = 1;
-        let lastVolume = 1; // 用于静音恢复
+        audio.volume = 0;
+        let userVolume = 1;
+        let lastVol = 1;
+        let fadeToken = 0;
+        let spinAnim = null;
+        let stopAnim = null;
+        let coverDelayTimer = 0;
+        const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
         const updateVolumeUI = () => {
-            const vol = audio.volume;
-            volumeRangeInput.value = vol;
+            volumeRangeInput.value = userVolume;
             if (volumePercentText) {
-                volumePercentText.textContent = Math.round(vol * 100) + '%';
+                volumePercentText.textContent = Math.round(userVolume * 100) + '%';
             }
-            if (vol === 0) {
+            if (userVolume === 0) {
                 volumeToggleBtn.innerHTML = svg_volume_mute;
                 volumeToggleBtn.style.opacity = 0.5;
             } else {
@@ -109,19 +118,162 @@ function attachAudioInitMethods(app) {
                 volumeToggleBtn.style.opacity = 0.8;
             }
         };
+
+        const fadeVolume = (from, to, ms) => new Promise((resolve) => {
+            const token = ++fadeToken;
+            if (prefersReducedMotion || ms <= 0) {
+                audio.volume = to;
+                resolve(true);
+                return;
+            }
+            const start = performance.now();
+            const step = (now) => {
+                if (token !== fadeToken) {
+                    resolve(false);
+                    return;
+                }
+                const p = Math.min(1, (now - start) / ms);
+                const e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+                audio.volume = from + (to - from) * e;
+                if (p < 1) {
+                    requestAnimationFrame(step);
+                } else {
+                    audio.volume = to;
+                    resolve(true);
+                }
+            };
+            requestAnimationFrame(step);
+        });
+
+        const getCoverAngle = () => {
+            const t = getComputedStyle(coverImg).transform;
+            if (!t || t === 'none') return 0;
+            try {
+                const m = new DOMMatrixReadOnly(t);
+                return Math.atan2(m.b, m.a) * (180 / Math.PI);
+            } catch (err) {
+                return 0;
+            }
+        };
+
+        const cancelCoverAnims = () => {
+            if (spinAnim) {
+                spinAnim.cancel();
+                spinAnim = null;
+            }
+            if (stopAnim) {
+                stopAnim.cancel();
+                stopAnim = null;
+            }
+            coverImg.style.transform = '';
+        };
+
+        const startCoverSpin = () => {
+            if (prefersReducedMotion) return;
+            if (spinAnim) return;
+            if (stopAnim) {
+                stopAnim.cancel();
+                stopAnim = null;
+            }
+            coverImg.style.transform = '';
+            // 错落：按钮先动，封面稍后再起转
+            clearTimeout(coverDelayTimer);
+            coverDelayTimer = setTimeout(() => {
+                if (audio.paused || spinAnim) return;
+                spinAnim = coverImg.animate([
+                    { transform: 'rotate(0deg)' },
+                    { transform: 'rotate(360deg)' }
+                ], {
+                    duration: 28000,
+                    iterations: Infinity,
+                    easing: 'linear'
+                });
+            }, prefersReducedMotion ? 0 : 200);
+        };
+
+        const stopCoverSpinSmooth = () => {
+            if (prefersReducedMotion) {
+                cancelCoverAnims();
+                return;
+            }
+            const angle = getCoverAngle();
+            if (spinAnim) {
+                spinAnim.cancel();
+                spinAnim = null;
+            }
+            if (stopAnim) {
+                stopAnim.cancel();
+                stopAnim = null;
+            }
+            const from = angle;
+            const dist = Math.abs(from);
+            if (dist < 0.5) {
+                coverImg.style.transform = '';
+                return;
+            }
+            coverImg.style.transform = `rotate(${from}deg)`;
+            // 可见旋转只走一小段（≤40°），其余在透明度压低时归零，
+            // 与外框方圆/透明度过渡叠在一起，避免大幅“转回去”
+            const maxSwing = 40;
+            const swing = (from > 0 ? 1 : -1) * Math.min(dist, maxSwing);
+            const mid = from - swing;
+            let frames;
+            let duration;
+            if (dist <= maxSwing) {
+                frames = [
+                    { transform: `rotate(${from}deg)`, opacity: 1 },
+                    { transform: 'rotate(0deg)', opacity: 1 }
+                ];
+                duration = Math.min(700, Math.max(380, dist * 10));
+            } else {
+                frames = [
+                    { transform: `rotate(${from}deg)`, opacity: 1, offset: 0 },
+                    { transform: `rotate(${mid}deg)`, opacity: 0.2, offset: 0.48 },
+                    { transform: 'rotate(0deg)', opacity: 0.2, offset: 0.58 },
+                    { transform: 'rotate(0deg)', opacity: 1, offset: 1 }
+                ];
+                duration = 720;
+            }
+            stopAnim = coverImg.animate(frames, {
+                duration,
+                easing: 'cubic-bezier(0.33, 0, 0.2, 1)',
+                fill: 'forwards'
+            });
+            const anim = stopAnim;
+            const settle = () => {
+                if (spinAnim || stopAnim !== anim) return;
+                coverImg.style.transform = '';
+                coverImg.style.opacity = '';
+                anim.cancel();
+                stopAnim = null;
+            };
+            anim.finished.then(settle).catch(settle);
+        };
+
         volumeToggleBtn.onclick = (e) => {
             e.stopPropagation();
-            if (audio.volume > 0) {
-                lastVolume = audio.volume;
-                audio.volume = 0;
+            if (userVolume > 0) {
+                lastVol = userVolume;
+                userVolume = 0;
             } else {
-                audio.volume = lastVolume > 0 ? lastVolume : 1;
+                userVolume = lastVol > 0 ? lastVol : 1;
+            }
+            if (!audio.paused) {
+                audio.volume = userVolume;
+            } else {
+                fadeToken++;
+                audio.volume = 0;
             }
             updateVolumeUI();
         };
         volumeRangeInput.oninput = (e) => {
-            e.stopPropagation(); // 关键：防止拖动时触发外部点击事件
-            audio.volume = parseFloat(e.target.value);
+            e.stopPropagation();
+            userVolume = parseFloat(e.target.value);
+            lastVol = userVolume > 0 ? userVolume : lastVol;
+            if (!audio.paused) {
+                fadeToken++;
+                audio.volume = userVolume;
+            }
             updateVolumeUI();
         };
         volumePopupPanel.onclick = (e) => {
@@ -134,40 +286,40 @@ function attachAudioInitMethods(app) {
             }
         };
         playerContainer.addEventListener('click', closeVolPopup);
-        const updateVolIcon = () => {
-            if (audio.volume === 0) {
-                volumeToggleBtn.innerHTML = svg_volume_mute;
-                volumeToggleBtn.style.opacity = 0.5;
-            } else {
-                volumeToggleBtn.innerHTML = svg_volume;
-                volumeToggleBtn.style.opacity = 0.8;
-            }
-        };
-        let lastVol = 1;
-        volumeToggleBtn.onclick = () => {
-            if (audio.volume > 0) {
-                lastVol = audio.volume;
-                audio.volume = 0;
-                volumeRangeInput.value = 0;
-            } else {
-                audio.volume = lastVol > 0 ? lastVol : 0.5;
-                volumeRangeInput.value = audio.volume;
-            }
-            updateVolIcon();
-        };
+
         playBtn.onclick = () => {
             if (!audioContext) initVisualizer();
             if (audioContext && audioContext.state === 'suspended') audioContext.resume();
             if (audio.paused) {
-                audio.play();
-                playBtn.innerHTML = svg_pause;
-                coverImg.classList.add('playing');
+                audio.volume = 0;
+                audio.play().catch(() => { });
             } else {
-                audio.pause();
-                playBtn.innerHTML = svg_play;
-                coverImg.classList.remove('playing');
+                // 按钮立刻反馈，封面等音量淡出 + pause 事件后再动
+                this.setPlayBtnState(playBtn, false);
+                fadeVolume(userVolume, 0, 340).then((ok) => {
+                    if (ok) audio.pause();
+                });
             }
         };
+        audio.addEventListener('play', () => {
+            this.setPlayBtnState(playBtn, true);
+            // 按钮 → 外框(CSS delay) → 旋转(200ms) 级联
+            if (coverFrame) coverFrame.classList.add('playing', 'is-active');
+            startCoverSpin();
+            fadeVolume(0, userVolume, 480);
+        });
+        audio.addEventListener('pause', () => {
+            this.setPlayBtnState(playBtn, false);
+            clearTimeout(coverDelayTimer);
+            // 先停转，外框稍后再收回方形
+            stopCoverSpinSmooth();
+            coverDelayTimer = setTimeout(() => {
+                if (!audio.paused) return;
+                if (coverFrame) coverFrame.classList.remove('playing', 'is-active');
+            }, prefersReducedMotion ? 0 : 120);
+            fadeToken++;
+            audio.volume = 0;
+        });
         audio.addEventListener('timeupdate', () => {
             if (!isDragging) {
                 const percent = (audio.currentTime / audio.duration) * 100;
@@ -181,8 +333,6 @@ function attachAudioInitMethods(app) {
             audio.play().catch(() => { }).then(() => {
                 if (!audioContext) initVisualizer();
             });
-            playBtn.innerHTML = svg_pause;
-            coverImg.classList.add('playing');
         });
         audio.addEventListener('ended', () => {
             if (this.state.loopMode === 'one') {
@@ -193,8 +343,6 @@ function attachAudioInitMethods(app) {
                 this.playNextInFavorites(file, this.state.loopMode === 'shuffle');
             }
             else {
-                playBtn.innerHTML = svg_play;
-                coverImg.classList.remove('playing');
                 progress.style.width = '0%';
             }
         });
@@ -285,6 +433,8 @@ function attachAudioInitMethods(app) {
             ctx: audioContext, // Web Audio Context
             close: () => {
                 if (animationId) cancelAnimationFrame(animationId);
+                cancelCoverAnims();
+                fadeToken++;
                 if (audioContext) audioContext.close();
             }
         };
