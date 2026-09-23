@@ -1,4 +1,4 @@
-// 收藏模块：维护收藏列表、收藏按钮状态和收藏项跳转。
+// 收藏模块：维护收藏列表、收藏按钮状态、收藏项跳转和拖动排序。
 
 function attachFavoriteMethods(app) {
 
@@ -9,7 +9,7 @@ function attachFavoriteMethods(app) {
             return;
         }
         let html = '';
-        this.state.favorites.forEach(fav => {
+        this.state.favorites.forEach((fav, index) => {
             const isFolder = fav.isFolder || false;
             let path = fav.path || '';
             if (!path && isFolder && fav.url) {
@@ -19,11 +19,186 @@ function attachFavoriteMethods(app) {
             const safeUrl = fav.url.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
             const safeName = fav.name.replace(/'/g, "\\'");
             const safePath = path.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-            html += `<div class="sidebar-item" onclick="app.openFavorite('${safeUrl}', '${safeName}', ${isFolder}, '${safePath}')">
-                <span class="file-icon" style="font-size:16px">${icon}</span> ${fav.name}
+            html += `<div class="sidebar-item fav-drag-item" data-fav-index="${index}" onclick="app.openFavorite('${safeUrl}', '${safeName}', ${isFolder}, '${safePath}')">
+                <span class="file-icon" style="font-size:16px">${icon}</span>
+                <span class="fav-label">${fav.name}</span>
             </div>`;
         });
         list.innerHTML = html;
+        this.bindFavoriteDrag();
+  };
+
+  app.bindFavoriteDrag = function bindFavoriteDrag() {
+        const list = this.dom.favList;
+        if (!list || list.dataset.dragBound === '1') return;
+        list.dataset.dragBound = '1';
+
+        let dragEl = null;
+        let activePointer = null;
+        let startY = 0;
+        let started = false;
+        let suppressClick = false;
+        let holdTimer = null;
+        let holdItem = null;
+        let armedByHold = false;
+        let dropTarget = null;
+        let dropBefore = true;
+
+        const clearHold = () => {
+            if (holdTimer) {
+                clearTimeout(holdTimer);
+                holdTimer = null;
+            }
+            if (holdItem) {
+                holdItem.classList.remove('touch-ready');
+                holdItem = null;
+            }
+            armedByHold = false;
+            list.style.touchAction = '';
+        };
+
+        const clearDropMarks = () => {
+            list.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+            list.classList.remove('drag-before', 'drag-after');
+            dropTarget = null;
+        };
+
+        const clearState = () => {
+            clearHold();
+            clearDropMarks();
+            if (dragEl) {
+                dragEl.classList.remove('dragging');
+                dragEl.style.width = '';
+            }
+            dragEl = null;
+            activePointer = null;
+            started = false;
+        };
+
+        const updateHover = (clientY) => {
+            if (!dragEl) return;
+            const items = [...list.querySelectorAll('.fav-drag-item')];
+            const target = items.find(el => {
+                if (el === dragEl) return false;
+                const rect = el.getBoundingClientRect();
+                return clientY >= rect.top && clientY <= rect.bottom;
+            });
+            clearDropMarks();
+            if (!target) return;
+            dropTarget = target;
+            const tRect = target.getBoundingClientRect();
+            dropBefore = clientY < tRect.top + tRect.height / 2;
+            target.classList.add(dropBefore ? 'drag-over' : 'drag-over');
+            list.classList.add(dropBefore ? 'drag-before' : 'drag-after');
+        };
+
+        const startDrag = (item) => {
+            const rect = item.getBoundingClientRect();
+            dragEl = item;
+            started = true;
+            suppressClick = true;
+            list.style.touchAction = 'none';
+            item.classList.add('dragging');
+            item.classList.remove('touch-ready');
+            item.style.width = `${rect.width}px`;
+        };
+
+        const commit = () => {
+            if (started && dropTarget && dropTarget !== dragEl) {
+                if (dropBefore) {
+                    list.insertBefore(dragEl, dropTarget);
+                } else {
+                    list.insertBefore(dragEl, dropTarget.nextSibling);
+                }
+                const order = [...list.querySelectorAll('.fav-drag-item')]
+                    .map(el => this.state.favorites[Number(el.dataset.favIndex)])
+                    .filter(Boolean);
+                if (order.length === this.state.favorites.length) {
+                    this.state.favorites = order;
+                    localStorage.setItem('favorites', JSON.stringify(order));
+                }
+            }
+            const wasStarted = started;
+            clearState();
+            if (wasStarted) {
+                this.renderFavorites();
+                setTimeout(() => { suppressClick = false; }, 0);
+            }
+        };
+
+        list.addEventListener('pointerdown', (e) => {
+            if (e.button != null && e.button !== 0) return;
+            const item = e.target.closest('.fav-drag-item');
+            if (!item) return;
+
+            activePointer = e.pointerId;
+            startY = e.clientY;
+            suppressClick = false;
+            dragEl = null;
+            started = false;
+            armedByHold = false;
+            holdItem = item;
+            dropTarget = null;
+
+            if (e.pointerType === 'touch' || e.pointerType === 'pen') {
+                holdItem.classList.add('touch-ready');
+                holdTimer = setTimeout(() => {
+                    armedByHold = true;
+                    list.style.touchAction = 'none';
+                    try { item.setPointerCapture(e.pointerId); } catch (_) { }
+                    if (navigator.vibrate) { try { navigator.vibrate(15); } catch (_) { } }
+                }, 350);
+            }
+
+            const onPointerMove = (ev) => {
+                if (ev.pointerId !== activePointer) return;
+                if (!started) {
+                    const dy = Math.abs(ev.clientY - startY);
+                    if (ev.pointerType === 'mouse') {
+                        if (dy < 10) return;
+                        clearHold();
+                        startDrag(item);
+                    } else {
+                        if (!armedByHold) {
+                            if (dy > 8) clearHold();
+                            return;
+                        }
+                        if (dy < 8) return;
+                        startDrag(item);
+                    }
+                }
+                ev.preventDefault();
+                updateHover(ev.clientY);
+            };
+
+            const onPointerUp = (ev) => {
+                if (ev.pointerId !== activePointer) return;
+                window.removeEventListener('pointermove', onPointerMove);
+                window.removeEventListener('pointerup', onPointerUp);
+                window.removeEventListener('pointercancel', onPointerUp);
+                window.removeEventListener('touchmove', onTouchMove, true);
+                commit();
+            };
+
+            const onTouchMove = (ev) => {
+                if (started || armedByHold) {
+                    ev.preventDefault();
+                }
+            };
+
+            window.addEventListener('pointermove', onPointerMove, { passive: false });
+            window.addEventListener('pointerup', onPointerUp);
+            window.addEventListener('pointercancel', onPointerUp);
+            window.addEventListener('touchmove', onTouchMove, { passive: false, capture: true });
+        });
+
+        list.addEventListener('click', (e) => {
+            if (suppressClick) {
+                e.stopPropagation();
+                e.preventDefault();
+                suppressClick = false;
+            }
+        }, true);
   };
 
   app.openFavorite = function openFavorite(url, name, isFolder, path) {
