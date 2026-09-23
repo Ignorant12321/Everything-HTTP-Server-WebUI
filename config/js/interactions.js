@@ -66,7 +66,17 @@ function attachInteractionMethods(app) {
         this.dom.viewMenu.classList.remove('show');
         this.updateMenusUI();                        // 同步视图菜单的选中状态
         this.renderList();                           // 重新渲染文件列表（应用新视图样式）
+        this.animateViewToggle();
   };
+
+  app.animateViewToggle = function animateViewToggle() {
+        const icon = document.getElementById('viewToggleIcon');
+        if (!icon) return;
+        icon.getAnimations().forEach((a) => a.cancel());
+        icon.classList.remove('anim-swap');
+        void icon.getBoundingClientRect();
+        icon.classList.add('anim-swap');
+    };
 
   app.toggleTheme = function toggleTheme(event) {
         const iconEl = this.dom.themeToggleIcon;
@@ -153,24 +163,95 @@ function attachInteractionMethods(app) {
         this.updateMenusUI();
   };
 
-  app.toggleFullScreen = function toggleFullScreen(uid) {
+  app.toggleFullScreen = async function toggleFullScreen(uid) {
         const container = document.getElementById(`audioContainer-${uid}`);
-        if (!document.fullscreenElement) {
-            if (container.requestFullscreen) {
-                container.requestFullscreen();
-            } else if (container.webkitRequestFullscreen) { /* Safari */
-                container.webkitRequestFullscreen();
-            } else if (container.msRequestFullscreen) { /* IE11 */
-                container.msRequestFullscreen();
+        if (!container) return;
+
+        const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const entering = !document.fullscreenElement;
+
+        const requestFs = () => {
+            if (entering) {
+                if (container.requestFullscreen) return container.requestFullscreen();
+                if (container.webkitRequestFullscreen) {
+                    container.webkitRequestFullscreen();
+                    return Promise.resolve();
+                }
+                if (container.msRequestFullscreen) {
+                    container.msRequestFullscreen();
+                    return Promise.resolve();
+                }
+                return Promise.reject(new Error('fullscreen unsupported'));
             }
-        } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) {
+            if (document.exitFullscreen) return document.exitFullscreen();
+            if (document.webkitExitFullscreen) {
                 document.webkitExitFullscreen();
+                return Promise.resolve();
             }
+            return Promise.reject(new Error('exitFullscreen unsupported'));
+        };
+
+        if (reduced) {
+            try { await requestFs(); } catch (_) { /* 忽略用户取消/不支持 */ }
+            this.updateFullScreenBtn(uid, entering);
+            return;
         }
-  };
+
+        const first = container.getBoundingClientRect();
+        try {
+            await requestFs();
+        } catch (_) {
+            this.updateFullScreenBtn(uid, false);
+            return;
+        }
+        const last = container.getBoundingClientRect();
+
+        if (last.width > 0 && last.height > 0 && Math.abs(last.width - first.width) > 1) {
+            // 结束帧必须保留退出后的 CSS transform（如 translate(-50%,-50%)），
+            // 否则动画一结束会从错误位置跳回居中
+            const cssTransform = getComputedStyle(container).transform;
+            const endTransform = (!cssTransform || cssTransform === 'none') ? 'none' : cssTransform;
+            let tx = 0;
+            let ty = 0;
+            if (endTransform !== 'none') {
+                try {
+                    const m = new DOMMatrix(endTransform);
+                    tx = m.m41;
+                    ty = m.m42;
+                } catch (_) { /* 非矩阵则按无平移处理 */ }
+            }
+            const dx = first.left - last.left;
+            const dy = first.top - last.top;
+            const sx = first.width / last.width;
+            const sy = first.height / last.height;
+            try {
+                await container.animate([
+                    {
+                        transformOrigin: 'top left',
+                        transform: `translate(${dx + tx}px, ${dy + ty}px) scale(${sx}, ${sy})`
+                    },
+                    {
+                        transformOrigin: 'top left',
+                        transform: endTransform
+                    }
+                ], {
+                    duration: entering ? 420 : 360,
+                    easing: entering
+                        ? 'cubic-bezier(0.19, 1, 0.22, 1)'
+                        : 'cubic-bezier(0.4, 0, 0.2, 1)'
+                }).finished;
+            } catch (_) { /* 动画可能被新 FS 状态打断 */ }
+        }
+
+        this.updateFullScreenBtn(uid, entering);
+    };
+
+  app.updateFullScreenBtn = function updateFullScreenBtn(uid, isFull) {
+        const btn = document.getElementById(`fsBtn-${uid}`);
+        if (!btn) return;
+        btn.title = isFull ? '退出全屏' : '全屏';
+        btn.setAttribute('aria-pressed', isFull ? 'true' : 'false');
+    };
 
   app.applyTheme = function applyTheme() {
         document.documentElement.setAttribute('data-theme', this.state.theme);

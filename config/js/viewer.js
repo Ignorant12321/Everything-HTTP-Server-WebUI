@@ -117,17 +117,42 @@ function attachViewerMethods(app) {
         }
 
         currentFileContainer.classList.add('active');
-        modal.classList.add('open');
+
+        if (modal.classList.contains('open')) {
+            modal.classList.add('open');
+            return;
+        }
+        // 先强制回流到关闭态，再在下一帧加 .open，保证 scale/opacity 过渡能播出来
+        void modal.offsetWidth;
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                modal.classList.add('open');
+            });
+        });
     };
 
   app.minimizeViewer = function minimizeViewer() {
         this.dom.viewerModal.classList.add('minimized');
   };
 
+  app.getViewerExitMs = function getViewerExitMs() {
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 0;
+        return 420;
+  };
+
   app.hideViewer = function hideViewer() {
-        this.dom.viewerModal.classList.remove('open');
-        this.dom.viewerModal.classList.remove('minimized');
-        this.dom.viewerModal.classList.remove('music-mode');
+        const modal = this.dom.viewerModal;
+        modal.classList.remove('open');
+        modal.classList.remove('minimized');
+        // 音乐模式先留着，等内容退场动画结束再撤，避免遮罩/背景闪一下
+        const dropMusicMode = () => modal.classList.remove('music-mode');
+        const ms = this.getViewerExitMs();
+        if (ms <= 0) {
+            dropMusicMode();
+            return;
+        }
+        clearTimeout(this._viewerMusicModeTimer);
+        this._viewerMusicModeTimer = setTimeout(dropMusicMode, ms);
     };
 
   app.closeViewer = function closeViewer() {
@@ -138,6 +163,7 @@ function attachViewerMethods(app) {
         if (e) e.stopPropagation();
 
         const fileToRemove = this.state.openFiles[index];
+        if (!fileToRemove) return;
 
         if (fileToRemove._audioContext) {
             if (fileToRemove._audioContext.audio) {
@@ -150,26 +176,33 @@ function attachViewerMethods(app) {
         }
 
         const containerToRemove = document.getElementById(fileToRemove.uniqueId);
-        if (containerToRemove) containerToRemove.remove();
-
         this.state.openFiles.splice(index, 1);
 
         if (this.state.openFiles.length > 0) {
             if (index === this.state.activeFileIndex) {
-                const newIndex = Math.max(0, index - 1);
-                this.activateFile(newIndex);
+                this.state.activeFileIndex = Math.max(0, index - 1);
             } else if (index < this.state.activeFileIndex) {
                 this.state.activeFileIndex--;
-                this.renderTaskBar();
-            } else {
-                this.renderTaskBar();
             }
-            this.hideViewer();
-        } else {
-            this.state.activeFileIndex = -1;
             this.renderTaskBar();
+            if (containerToRemove) containerToRemove.remove();
             this.hideViewer();
+            return;
         }
+
+        this.state.activeFileIndex = -1;
+        this.renderTaskBar();
+        // 最后一关：先播退出动画，结束后再拆播放器 DOM
+        this.hideViewer();
+        const ms = this.getViewerExitMs();
+        if (ms <= 0) {
+            if (containerToRemove) containerToRemove.remove();
+            return;
+        }
+        clearTimeout(this._viewerRemoveTimer);
+        this._viewerRemoveTimer = setTimeout(() => {
+            if (containerToRemove) containerToRemove.remove();
+        }, ms);
     };
 
   app.renderTaskBar = function renderTaskBar() {

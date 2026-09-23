@@ -15,7 +15,8 @@
     background: transparent;
     visibility: hidden;
     pointer-events: none;
-    transition: visibility 0.3s;
+    /* 需 ≥ viewer-content 退场时长，避免内容还在缩放就被 visibility 切掉 */
+    transition: visibility 0.42s;
 }
 
 .viewer-modal::before {
@@ -125,6 +126,20 @@
 .viewer-modal.open .viewer-content {
     transform: scale(1);
     opacity: 1;
+}
+
+/* 关闭：工具栏同步上滑，与内容缩放一起退场 */
+.viewer-modal:not(.open) .viewer-toolbar {
+    transform: translateY(-100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .viewer-modal,
+    .viewer-modal::before,
+    .viewer-content,
+    .viewer-toolbar {
+        transition-duration: 0.01ms !important;
+    }
 }
 
 /* ########## 
