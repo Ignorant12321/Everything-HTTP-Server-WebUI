@@ -12,9 +12,16 @@ function attachLifecycleMethods(app) {
         this.initSidebarSwipe();    // 初始化侧边栏滑动功能（如侧边栏的左滑关闭）
         this.initSubtitleHandler(); // 初始化字幕处理逻辑（用于视频字幕加载）
         this.initKeyboardShortcuts(); // 初始化桌面键盘快捷键
+        this.initBreadcrumb();         // 初始化地址栏面包屑（分段跳转/编辑/子目录下拉）
 
         this.dom.address.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') this.navigateTo(this.dom.address.value.trim());
+            else if (e.key === 'Escape') {
+                e.preventDefault();
+                e.stopPropagation();
+                this.exitAddressEdit();
+                this.dom.address.blur();
+            }
         });
 
         this.dom.address.addEventListener('input', () => {
@@ -32,7 +39,7 @@ function attachLifecycleMethods(app) {
         });
 
         this.dom.address.addEventListener('blur', () => {
-            this.animatePathRestore();
+            this.exitAddressEdit();
         });
 
         this.dom.address.addEventListener('focus', () => {

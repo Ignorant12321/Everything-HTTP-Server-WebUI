@@ -2,6 +2,8 @@
 function queryDom() {
   return {
         address: document.getElementById('addressInput'),       // 地址栏输入框
+        addressContainer: document.getElementById('addressContainer'), // 地址栏容器（面包屑/编辑双模式）
+        breadcrumb: document.getElementById('addressBreadcrumb'), // 地址栏面包屑导航
         list: document.getElementById('fileList'),             // 文件列表容器
         header: document.getElementById('colHeader'),          // 文件列表：列标题容器
         filePane: document.getElementById('filePane'),         // 文件列表主面板（列宽模板变量挂载点）
@@ -23,6 +25,7 @@ function queryDom() {
         viewerSubBtn: document.getElementById('viewerSubBtn'),  // 预览弹窗：字幕加载按钮
         subtitleInput: document.getElementById('subtitleInput'), // 字幕文件输入
         viewerFavBtn: document.getElementById('viewerFavBtn'), // 预览弹窗：收藏按钮
+        viewerLocateBtn: document.getElementById('viewerLocateBtn'), // 预览弹窗：定位到文件位置按钮
         sidebar: document.getElementById('sidebar'),           // 左侧：侧边栏容器
         statusLeft: document.getElementById('statusLeft'),     // 左侧状态栏（显示文件数量等）
         toast: document.getElementById('copyToast'),           // 复制成功提示框

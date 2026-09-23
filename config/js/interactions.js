@@ -1,8 +1,8 @@
 // 交互模块：菜单、主题、视图设置和清空输入动画。
 function attachInteractionMethods(app) {
   const viewToggleIcons = {
-        grid: '<path d="M2 2.5A1.5 1.5 0 0 1 3.5 1h3A1.5 1.5 0 0 1 8 2.5v3A1.5 1.5 0 0 1 6.5 7h-3A1.5 1.5 0 0 1 2 5.5v-3zM3.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM9 2.5A1.5 1.5 0 0 1 10.5 1h2A1.5 1.5 0 0 1 14 2.5v3A1.5 1.5 0 0 1 12.5 7h-2A1.5 1.5 0 0 1 9 5.5v-3zM10.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-2zM2 10.5A1.5 1.5 0 0 1 3.5 9h3A1.5 1.5 0 0 1 8 10.5v3A1.5 1.5 0 0 1 6.5 15h-3A1.5 1.5 0 0 1 2 13.5v-3zM3.5 10a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM9 10.5A1.5 1.5 0 0 1 10.5 9h2a1.5 1.5 0 0 1 1.5 1.5v3A1.5 1.5 0 0 1 12.5 15h-2A1.5 1.5 0 0 1 9 13.5v-3zM10.5 10a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-2z"></path>',
-        list: '<path d="M2.5 3A1.5 1.5 0 1 0 2.5 6 1.5 1.5 0 0 0 2.5 3zM6 3.5a.5.5 0 0 0 0 1h7.5a.5.5 0 0 0 0-1H6zM6 5.5a.5.5 0 0 0 0 1h5.5a.5.5 0 0 0 0-1H6zM2.5 8A1.5 1.5 0 1 0 2.5 11 1.5 1.5 0 0 0 2.5 8zM6 8.5a.5.5 0 0 0 0 1h7.5a.5.5 0 0 0 0-1H6zM6 10.5a.5.5 0 0 0 0 1h5.5a.5.5 0 0 0 0-1H6z"></path>'
+        grid: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+        list: '<path d="M2 16.5h5V21H2zm7.5 0H22V21H9.5zM2 9.75h5v4.5H2zM2 3h5v4.5H2zm7.5 0H22v4.5H9.5zm0 6.75H22v4.5H9.5z"/>'
   };
 
   app.animateClear = function animateClear() {
@@ -399,6 +399,13 @@ function attachInteractionMethods(app) {
   };
 
   app.handleGlobalKeydown = function handleGlobalKeydown(e) {
+        const key = (e.key || '').toLowerCase();
+        if ((e.ctrlKey && !e.altKey && !e.metaKey && key === 'l') || (e.altKey && key === 'd')) {
+            e.preventDefault();
+            this.enterAddressEdit();
+            return;
+        }
+
         if (this.isTextEditingTarget(e.target)) return;
 
         if (e.key === ' ' || e.key === 'Spacebar') {

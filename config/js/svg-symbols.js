@@ -76,11 +76,17 @@ const EXTRA_SYMBOLS = `
     <symbol id="icon-spinner" viewBox="0 0 16 16">
         <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M13.5 8A5.5 5.5 0 1 1 8 2.5"/>
     </symbol>
+<symbol id="icon-locate" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+        <circle cx="12" cy="10" r="3" />
+        <path d="M12 2a8 8 0 0 0-8 8c0 1.892.402 3.13 1.5 4.5L12 22l6.5-7.5c1.098-1.37 1.5-2.608 1.5-4.5a8 8 0 0 0-8-8" />
+    </g>
+</symbol>
 </svg>`;
 
 function injectSvgSymbols() {
-  if (document.getElementById('icon-adress')) return;
-  document.body.insertAdjacentHTML('beforeend', SVG_SYMBOLS + EXTRA_SYMBOLS);
+    if (document.getElementById('icon-adress')) return;
+    document.body.insertAdjacentHTML('beforeend', SVG_SYMBOLS + EXTRA_SYMBOLS);
 }
 
 injectSvgSymbols();

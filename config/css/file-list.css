@@ -247,7 +247,7 @@
 
 #fileList.view-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     grid-auto-rows: 130px;
     gap: 8px;
     padding: 16px;
@@ -257,6 +257,7 @@
 #fileList.view-grid .file-row {
     display: flex;
     flex-direction: column;
+    min-width: 0;
     height: 100%;
     width: 100%;
     padding: 8px;
@@ -264,6 +265,7 @@
     border: 1px solid transparent;
     align-items: center;
     text-align: center;
+    overflow: hidden;
 }
 
 #fileList.view-grid .file-row:hover {
@@ -292,13 +294,15 @@
 
 #fileList.view-grid .cell-name {
     flex-shrink: 1;
-    min-width: 200px;
+    min-width: 0;
+    max-width: 100%;
     font-size: 13px;
     width: 100%;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     white-space: normal;
+    overflow-wrap: anywhere;
     line-height: 1.3;
     height: 34px;
     overflow: hidden;
@@ -309,4 +313,14 @@
 #fileList.view-grid .cell-meta,
 #fileList.view-grid .cell-type {
     display: none;
+}
+
+/* 网格视图空状态：脱离网格排版，改为 flex 水平居中（.center-msg 自带 height:100% 垂直居中） */
+#fileList.view-grid:has(> .center-msg) {
+    display: flex;
+    justify-content: center;
+}
+
+#fileList.view-grid .center-msg {
+    width: 100%;
 }

@@ -18,7 +18,8 @@ function attachViewerMethods(app) {
             ext: ext,
             type: this.getFileType(ext),
             content: null,
-            uniqueId: 'file-' + Date.now()
+            uniqueId: 'file-' + Date.now(),
+            fullPath: this.getViewerFileFullPath(item, url)
         };
 
         this.state.openFiles.push(newFile);
@@ -134,6 +135,78 @@ function attachViewerMethods(app) {
   app.minimizeViewer = function minimizeViewer() {
         this.dom.viewerModal.classList.add('minimized');
   };
+
+  app.getViewerFileFullPath = function getViewerFileFullPath(item, url) {
+        if (item && item.path) return this.getItemFullPath(item);
+        const raw = url || (item && (item.fakeUrl || '')) || '';
+        if (!raw) return '';
+        try {
+            return decodeURIComponent(raw).replace(/^\//, '').replace(/\//g, '\\');
+        } catch (_) {
+            return raw.replace(/^\//, '').replace(/\//g, '\\');
+        }
+    };
+
+  app.findFilePageOffset = async function findFilePageOffset(parentPath, fileName, fullPath) {
+        if (window.location.protocol === 'file:' || window.location.protocol === 'blob:') return 0;
+
+        try {
+            let query = `parent:"${parentPath}"`;
+            if (!this.state.showHidden) query += ' !attrib:H';
+
+            const scanSize = 1000;
+            const pageSize = this.state.count || 100;
+            let offset = 0;
+            let total = Infinity;
+
+            while (offset < total) {
+                const params = new URLSearchParams({
+                    search: query,
+                    offset,
+                    count: scanSize,
+                    sort: this.state.sortCol,
+                    ascending: this.state.sortAsc,
+                    json: 1
+                });
+                const res = await fetch(`/?${params}`);
+                if (!res.ok) break;
+                const data = await res.json();
+                const results = data.results || [];
+                total = parseInt(data.totalResults) || 0;
+
+                const idx = results.findIndex(r => {
+                    const itemFull = r.path ? `${r.path}\\${r.name}` : r.name;
+                    return itemFull === fullPath || r.name === fileName;
+                });
+                if (idx !== -1) {
+                    return Math.floor((offset + idx) / pageSize) * pageSize;
+                }
+                if (results.length === 0) break;
+                offset += results.length;
+            }
+        } catch (_) { /* 查询失败时回退到第一页 */ }
+        return 0;
+    };
+
+  app.locateCurrentFile = async function locateCurrentFile() {
+        if (this.state.activeFileIndex === -1) return;
+        const file = this.state.openFiles[this.state.activeFileIndex];
+        if (!file) return;
+
+        const fullPath = file.fullPath || this.getViewerFileFullPath(null, file.url);
+        if (!fullPath || !/^[a-zA-Z]:\\|^\\\\/.test(fullPath)) return;
+
+        const idx = fullPath.lastIndexOf('\\');
+        if (idx <= 0) return;
+        const fileName = fullPath.slice(idx + 1);
+        let parent = fullPath.slice(0, idx);
+        if (/^[a-zA-Z]:$/.test(parent)) parent += '\\';
+
+        this.minimizeViewer();
+        this.state.targetFile = fileName;
+        const pageOffset = await this.findFilePageOffset(parent, fileName, fullPath);
+        this.navigateTo(parent, true, pageOffset);
+    };
 
   app.getViewerExitMs = function getViewerExitMs() {
         if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 0;

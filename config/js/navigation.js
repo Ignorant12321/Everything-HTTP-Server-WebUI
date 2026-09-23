@@ -2,13 +2,15 @@
 
 function attachNavigationMethods(app) {
 
-  app.navigateTo = function navigateTo(path, isExplicitFolder = false) {
+  app.navigateTo = function navigateTo(path, isExplicitFolder = false, startOffset = 0) {
         path = path ? path.replace(/^"|"$/g, '').trim() : '';
 
         if (path === '') {
             this.state.currentPath = this.config.defaultPath;
             path = this.config.defaultPath;
         }
+
+        if (/^[a-zA-Z]:$/.test(path)) path += '\\';
 
         if (!this.state.isNavigatingHistory) {
             if (this.state.historyIndex < this.state.history.length - 1) {
@@ -21,10 +23,12 @@ function attachNavigationMethods(app) {
         }
 
         this.state.currentPath = path;
-        this.state.offset = 0;
+        this.state.offset = Math.max(0, startOffset | 0);
         this.dom.address.value = path;
         // 导航覆写地址时结束清空/飞回动画，避免 input-animating 让路径透明不可见
         if (this.endAddressFx) this.endAddressFx();
+        if (this.setAddressMode) this.setAddressMode('breadcrumb');
+        if (this.renderBreadcrumb) this.renderBreadcrumb(path);
         this.state.selectedItem = null;
         this.renderDetails(null);
         document.getElementById('btnBack').disabled = this.state.historyIndex <= 0;
@@ -64,10 +68,11 @@ function attachNavigationMethods(app) {
     };
 
   app.refresh = function refresh() {
-        btnRefresh.classList.add('anim-rotate');
-        setTimeout(() => {
-            btnRefresh.classList.remove('anim-rotate');
-        }, 500);
+        const icon = btnRefresh.querySelector('svg');
+        if (icon) {
+            icon.classList.add('anim-rotate');
+            setTimeout(() => icon.classList.remove('anim-rotate'), 500);
+        }
         this.fetchData();
   };
 

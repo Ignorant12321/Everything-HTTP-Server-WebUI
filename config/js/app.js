@@ -7,6 +7,7 @@
   [
     attachFormatMethods,
     attachApiMethods,
+    attachBreadcrumbMethods,
     attachNavigationMethods,
     attachRenderListMethods,
     attachDetailsMethods,

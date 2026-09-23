@@ -1,6 +1,6 @@
 # Everything-HTTP Server-WebUI
 
-Everything的HTTP服务器界面UI，支持文件预览/查看功能
+Everything的HTTP服务器界面UI，支持文件预览/查看/下载功能
 
 ## 使用方法
 
@@ -61,30 +61,60 @@ defaultPath=D:\Data\Share
 
 ## 功能
 
+![image-20260923191638006](.assest/image-16.png)
+
 ### 顶部导航栏
 
-- 导航按钮：前进、后退、上一级、刷新等
+- 导航按钮：返回上一级、前进、后退、刷新等
 - 搜索框、清除按钮
 - 功能：排序、视图、深色模式、设置
 
-### 查找文件（支持正则表达式）
+#### 查找文件（支持 Everything 搜索语法）
 
-`F:\Entertainment\音乐`：进入该文件夹
-`folder:regex:^音乐$`：精确匹配名为“音乐”的文件夹
-`regex:(^[0-9]{2}$)`：匹配名称仅由“2个数字”组成的字符
-串
+地址栏输入后回车：
+
+- 若是真实文件夹路径（如 `F:\Entertainment\音乐`）→ 进入该文件夹
+- 若是真实文件路径 → 精确定位该文件
+- 若路径不存在或本身是搜索语法 → **原样透传给 Everything**
+
+常用：
+
+```tex
+进入文件夹				F:\Entertainment\音乐 或 "F:\Entertainment\音乐" 均可
+查找文件				"E:\21850\下载\时隔6年，再唱《霜雪千年》！还记得第一次听是什么时候吗？.mp4"
+当前文件夹搜索：		E:\Wallpapers 剑舞.png        空格 = AND（路径 且 文件名）
+查找某类型所有文件：	   *.pdf                        通配符
+```
+
+少用：
+
+```tex
+regex:\.png$                  正则：匹配 .png 结尾
+folder:regex:^音乐$           精确匹配名为“音乐”的文件夹
+size:>10MB ext:mp4;mkv        大小/类型过滤
+```
 
 ### 文件预览
 
 > 支持：空格快捷键快速预览、ESC快捷键最小化
 
-文本查看[包括：`txt`、`json` 等多种格式]
+#### 文本查看[包括：`txt`、`json` 等多种格式]
+
 ![alt text](.assest/image-7.png)
-图片查看
+
+#### 图片查看
+
 ![alt text](.assest/image-10.png)
-文本查看[如：pdf]
-音乐查看![alt text](.assest/image-6.png)
-视频查看![alt text](.assest/image-12.png)
+
+#### 文件查看[如：pdf]
+
+![image-20260923185328542](.assest/image-14.png)
+
+#### 音乐查看
+
+![alt text](.assest/image-6.png)
+
+#### 视频查看![alt text](.assest/image-12.png)
 
 ### 侧边信息栏
 
@@ -96,6 +126,12 @@ defaultPath=D:\Data\Share
 
 【文件夹下载测试中……】
 
-### 适配移动端
+### 其他功能
+
+#### 适配移动端
 
 ![alt text](.assest/image-13.png)
+
+#### 浅色和深色模式
+
+![image-20260923191112045](.assest/image-15.png)

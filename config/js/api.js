@@ -29,6 +29,38 @@ function attachApiMethods(app) {
         }
     };
 
+  app.normalizePathProbe = function normalizePathProbe(p) {
+        if (/^[a-zA-Z]:\\$/.test(p)) return p;
+        if (/^[a-zA-Z]:$/.test(p)) return p + '\\';
+        return p.replace(/\\+$/, '');
+    };
+
+  // 探测路径是否存在：返回 'folder' | 'file' | 'search'；探测失败返回 null
+  app.probePathKind = async function probePathKind(path) {
+        try {
+            const normalized = this.normalizePathProbe(path);
+            const params = new URLSearchParams({
+                search: `"${normalized}"`,
+                json: 1,
+                count: 5,
+                path_column: 1
+            });
+            const res = await fetch(`/?${params}`);
+            if (!res.ok) return null;
+            const data = await res.json();
+            const results = data.results || [];
+            const target = normalized.toLowerCase();
+            for (const item of results) {
+                const full = this.getItemFullPath(item).toLowerCase();
+                if (full !== target && full !== target + '\\') continue;
+                return this.isFolderItem(item) ? 'folder' : 'file';
+            }
+            return 'search';
+        } catch (_) {
+            return null;
+        }
+    };
+
   app.fetchData = async function fetchData(isExplicitFolder) {
         const list = this.dom.list;
         // 快返回时不闪“加载中”，慢请求再替换，避免内容→spinner→内容 的一闪
@@ -40,23 +72,37 @@ function attachApiMethods(app) {
             if (window.location.protocol === 'file:' || window.location.protocol === 'blob:') throw new Error('DEMO');
 
             let query = this.state.currentPath;
+            const isDriveRoot = query === 'root:';
 
-            if (query === 'root:') {
+            if (isDriveRoot) {
+                // 盘符列表：与 loadDrives 保持一致，附加 !attrib:H 会得到空结果
             } else if (isExplicitFolder) {
                 query = `parent:"${query}"`;
-            } else {
-                if (/^[a-zA-Z]:\\|^\\\\/.test(query)) {
-                    const knownExts = ['exe', 'jpg', 'png', 'txt', 'mp3', 'mp4', 'pdf', 'doc', 'docx', 'zip', 'rar', 'lrc'];
-                    const ext = query.split('.').pop().toLowerCase();
-                    if (knownExts.includes(ext) && query.split('\\').pop().includes('.')) {
-                        query = `"${query}"`;
-                    } else {
-                        query = `parent:"${query}"`;
+            } else if (/^[a-zA-Z]:\\|^\\\\/.test(query)) {
+                if (/^[a-zA-Z]:\\$/.test(query)) {
+                    query = `parent:"${query}"`;
+                } else {
+                    const kind = await this.probePathKind(query);
+                    if (kind === null) {
+                        // 探测失败：回退旧启发式，避免路径导航完全失效
+                        const knownExts = ['exe', 'jpg', 'png', 'txt', 'mp3', 'mp4', 'pdf', 'doc', 'docx', 'zip', 'rar', 'lrc'];
+                        const ext = query.split('.').pop().toLowerCase();
+                        if (knownExts.includes(ext) && query.split('\\').pop().includes('.')) {
+                            query = `"${query}"`;
+                        } else {
+                            query = `parent:"${query}"`;
+                        }
+                    } else if (kind === 'folder') {
+                        query = `parent:"${this.normalizePathProbe(query)}"`;
+                    } else if (kind === 'file') {
+                        query = `"${this.normalizePathProbe(query)}"`;
                     }
+                    // kind === 'search'：不存在的路径，原样透传（支持空格 AND、regex:、通配符等）
                 }
             }
+            // 非路径形态的输入（regex:*.png 等）本就原样透传
 
-            if (!this.state.showHidden) query += ' !attrib:H';
+            if (!isDriveRoot && !this.state.showHidden) query += ' !attrib:H';
 
             const params = new URLSearchParams({
                 search: query,

@@ -91,7 +91,10 @@ body {
 input,
 button,
 svg,
-.icon-btn {
+.icon-btn,
+.address-breadcrumb,
+.crumb-btn,
+.crumb-sep {
     transition: background-color var(--theme-transition), color var(--theme-transition), border-color var(--theme-transition), fill var(--theme-transition);
 }
 
