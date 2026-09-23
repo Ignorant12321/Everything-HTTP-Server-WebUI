@@ -1,0 +1,8 @@
+# OpenChamber local session artifacts
+.openchamber/
+
+# Local test scratch files
+_tmp*
+test-play*
+pp-*.png
+*.log
