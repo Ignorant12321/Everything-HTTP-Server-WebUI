@@ -17,6 +17,11 @@ function attachLifecycleMethods(app) {
             if (e.key === 'Enter') this.navigateTo(this.dom.address.value.trim());
         });
 
+        this.dom.clearBtn.addEventListener('mousedown', (e) => {
+            // 阻止 mousedown 默认行为：否则输入框先 blur，focus-within 焦点环会闪一下
+            e.preventDefault();
+        });
+
         this.dom.clearBtn.addEventListener('click', () => {
             this.animateClear();
         });
