@@ -68,15 +68,69 @@ function attachInteractionMethods(app) {
         this.renderList();                           // 重新渲染文件列表（应用新视图样式）
   };
 
-  app.toggleTheme = function toggleTheme() {
-        this.state.theme = this.state.theme === 'dark' ? 'light' : 'dark';
-        themeToggleIcon.innerText = this.state.theme === 'dark' ? '🌙' : '☀';
-        themeToggleIcon.classList.add('anim-rotate');
-        localStorage.setItem('theme', this.state.theme);
-        this.applyTheme();
-        setTimeout(() => {
-            themeToggleIcon.classList.remove('anim-rotate');
-        }, 500);
+  app.toggleTheme = function toggleTheme(event) {
+        const iconEl = this.dom.themeToggleIcon;
+        const btn = (event && event.currentTarget) || (iconEl && iconEl.closest('.icon-btn'));
+        const rect = btn ? btn.getBoundingClientRect() : null;
+        const x = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
+        const y = rect ? rect.top + rect.height / 2 : window.innerHeight / 2;
+        const dx = Math.max(x, window.innerWidth - x);
+        const dy = Math.max(y, window.innerHeight - y);
+        const radius = Math.ceil(Math.hypot(dx, dy));
+        const nextTheme = this.state.theme === 'dark' ? 'light' : 'dark';
+
+        const root = document.documentElement;
+        root.style.setProperty('--theme-reveal-x', `${x}px`);
+        root.style.setProperty('--theme-reveal-y', `${y}px`);
+        root.style.setProperty('--theme-reveal-r', `${radius}px`);
+
+        let applied = false;
+        const applyUpdate = () => {
+            applied = true;
+            this.state.theme = nextTheme;
+            localStorage.setItem('theme', nextTheme);
+            this.applyTheme();
+        };
+
+        const startRotateFallback = () => {
+            if (iconEl) {
+                iconEl.classList.add('anim-rotate');
+                setTimeout(() => iconEl.classList.remove('anim-rotate'), 500);
+            }
+        };
+
+        const fallbackApply = () => {
+            startRotateFallback();
+            applyUpdate();
+        };
+
+        if (typeof document.startViewTransition === 'function') {
+            if (app._themeTransition) {
+                try { app._themeTransition.skipTransition(); } catch (err) { /* noop */ }
+                app._themeTransition = null;
+            }
+            root.classList.add('theme-no-transition');
+            try {
+                const transition = document.startViewTransition(applyUpdate);
+                app._themeTransition = transition;
+                const settle = () => {
+                    if (app._themeTransition === transition) app._themeTransition = null;
+                    try {
+                        root.classList.remove('theme-no-transition');
+                        if (!applied) fallbackApply();
+                    } catch (err) { /* noop */ }
+                };
+                transition.finished.then(settle, settle);
+                if (transition.ready) transition.ready.catch(() => {});
+                if (transition.updateCallbackDone) transition.updateCallbackDone.catch(() => {});
+                if (transition.skipped) transition.skipped.catch(() => {});
+                return;
+            } catch (err) {
+                root.classList.remove('theme-no-transition');
+            }
+        }
+
+        fallbackApply();
   };
 
   app.toggleHidden = function toggleHidden() {
@@ -120,6 +174,12 @@ function attachInteractionMethods(app) {
 
   app.applyTheme = function applyTheme() {
         document.documentElement.setAttribute('data-theme', this.state.theme);
+        const iconEl = this.dom.themeToggleIcon;
+        if (iconEl) {
+            iconEl.innerHTML = this.state.theme === 'dark'
+                ? '<svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><use href="#icon-moon"></use></svg>'
+                : '<svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><use href="#icon-sun"></use></svg>';
+        }
   };
 
   app.updateMenusUI = function updateMenusUI() {
@@ -135,7 +195,7 @@ function attachInteractionMethods(app) {
         document.getElementById('checkOverlay').style.opacity = this.state.openMethod === 'overlay' ? 1 : 0;    // 浮层打开选中态
         document.getElementById('checkNewWin').style.opacity = this.state.openMethod === 'newWindow' ? 1 : 0; // 新窗口打开选中态
         this.dom.list.className = this.state.viewMode === 'grid' ? 'view-grid' : '';
-        this.dom.header.style.display = this.state.viewMode === 'grid' ? 'none' : 'flex';
+        this.dom.header.style.display = this.state.viewMode === 'grid' ? 'none' : '';
         if (this.state.viewMode === 'list') this.renderHeader();
   };
 

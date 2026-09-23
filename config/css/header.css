@@ -52,6 +52,18 @@
     cursor: default;
 }
 
+#themeToggleIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    view-transition-name: theme-toggle-icon;
+}
+
+#sortBtn svg {
+    transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: transform;
+}
+
 #mobileMenuBtn {
     display: none;
 }
@@ -167,22 +179,20 @@
         flex-wrap: wrap;
     }
 
-    .pagination-controls .icon-btn {
-        width: 32px;
-        height: 32px;
+    .pagination-controls .page-btn {
+        width: 36px;
+        height: 34px;
+    }
+
+    .pagination-controls .page-indicator {
+        min-width: 84px;
+        height: 34px;
         font-size: 14px;
-        margin: 0 2px;
     }
 
     .pagination-controls .page-input {
-        width: 40px;
-        height: 32px;
+        width: 34px;
         font-size: 14px;
-    }
-
-    #totalPages {
-        font-size: 13px;
-        margin: 0 4px;
     }
 }
 

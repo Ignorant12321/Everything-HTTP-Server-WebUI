@@ -75,7 +75,18 @@ function attachNavigationMethods(app) {
         const totalPages = Math.ceil(total / count) || 1;
         this.dom.pageInput.value = currentPage;
         this.dom.pageInput.max = totalPages;
-        this.dom.totalPages.textContent = `/ ${totalPages} 页`;
+        this.dom.totalPages.textContent = totalPages;
+
+        const firstBtn = document.getElementById('pageFirstBtn');
+        const prevBtn = document.getElementById('pagePrevBtn');
+        const nextBtn = document.getElementById('pageNextBtn');
+        const lastBtn = document.getElementById('pageLastBtn');
+        const atStart = currentPage <= 1;
+        const atEnd = currentPage >= totalPages;
+        if (firstBtn) firstBtn.disabled = atStart;
+        if (prevBtn) prevBtn.disabled = atStart;
+        if (nextBtn) nextBtn.disabled = atEnd;
+        if (lastBtn) lastBtn.disabled = atEnd;
 
         const currentCount = items.length;
         let statusText = `共 ${total} 个项目`;
@@ -103,6 +114,15 @@ function attachNavigationMethods(app) {
   app.sort = function sort(col) {
         if (this.state.sortCol === col) this.state.sortAsc = this.state.sortAsc ? 0 : 1;
         else { this.state.sortCol = col; this.state.sortAsc = 1; }
+
+        const sortBtn = document.getElementById('sortBtn');
+        const sortSvg = sortBtn && sortBtn.querySelector('svg');
+        if (sortSvg) {
+            const turns = Number(sortBtn.dataset.turns || 0) + 1;
+            sortBtn.dataset.turns = String(turns);
+            sortSvg.style.transform = `rotate(${turns * 180}deg)`;
+        }
+
         this.fetchData();
     };
 

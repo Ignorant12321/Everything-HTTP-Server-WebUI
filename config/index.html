@@ -6,35 +6,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Everything Explorer Ultimate</title>
     <link rel="stylesheet" href="../config/css/base.css?v=20260501-space-close">
-    <link rel="stylesheet" href="../config/css/layout.css?v=20260501-space-close">
-    <link rel="stylesheet" href="../config/css/header.css?v=20260501-space-close">
-    <link rel="stylesheet" href="../config/css/sidebar.css?v=20260501-space-close">
-    <link rel="stylesheet" href="../config/css/file-list.css?v=20260501-space-close">
+    <link rel="stylesheet" href="../config/css/layout.css?v=20260923-pageui2">
+    <link rel="stylesheet" href="../config/css/header.css?v=20260923-pageui">
+    <link rel="stylesheet" href="../config/css/sidebar.css?v=20260923-hier9">
+    <link rel="stylesheet" href="../config/css/file-list.css?v=20260923-colgrid">
     <link rel="stylesheet" href="../config/css/details.css?v=20260501-space-close">
-    <link rel="stylesheet" href="../config/css/viewer.css?v=20260501-space-close">
-    <link rel="stylesheet" href="../config/css/audio-player.css?v=20260501-space-close">
-    <link rel="stylesheet" href="../config/css/audio-volume.css?v=20260501-space-close">
-    <link rel="stylesheet" href="../config/css/responsive-audio.css?v=20260501-space-close">
-    <link rel="stylesheet" href="../config/css/utilities.css?v=20260501-space-close">
+    <link rel="stylesheet" href="../config/css/viewer.css?v=20260923-toolbarflash">
+    <link rel="stylesheet" href="../config/css/audio-player.css?v=20260923-lyrics">
+    <link rel="stylesheet" href="../config/css/audio-volume.css?v=20260923-stagger">
+    <link rel="stylesheet" href="../config/css/responsive-audio.css?v=20260923-lyrics">
+    <link rel="stylesheet" href="../config/css/utilities.css?v=20260923-iconrot">
     <link rel="stylesheet" href="../config/css/responsive.css?v=20260501-space-close">
     <script defer src="../config/vendor/jsmediatags.min.js?v=20260501-space-close"></script>
-    <script defer src="../config/js/svg-symbols.js?v=20260501-space-close"></script>
+    <script defer src="../config/js/svg-symbols.js?v=20260923-icons8"></script>
     <script defer src="../config/js/config.js?v=20260501-space-close"></script>
-    <script defer src="../config/js/icons.js?v=20260501-space-close"></script>
-    <script defer src="../config/js/state.js?v=20260501-space-close"></script>
-    <script defer src="../config/js/dom.js?v=20260501-space-close"></script>
+    <script defer src="../config/js/icons.js?v=20260923-ppmorph"></script>
+    <script defer src="../config/js/state.js?v=20260923-colgrid"></script>
+    <script defer src="../config/js/dom.js?v=20260923-colgrid"></script>
     <script defer src="../config/js/format.js?v=20260501-space-close"></script>
-    <script defer src="../config/js/api.js?v=20260501-space-close"></script>
-    <script defer src="../config/js/navigation.js?v=20260501-space-close"></script>
-    <script defer src="../config/js/render-list.js?v=20260501-space-close"></script>
+    <script defer src="../config/js/api.js?v=20260923-icons"></script>
+    <script defer src="../config/js/navigation.js?v=20260923-pageui"></script>
+    <script defer src="../config/js/render-list.js?v=20260923-colgrid"></script>
     <script defer src="../config/js/details.js?v=20260501-space-close"></script>
-    <script defer src="../config/js/favorites.js?v=20260501-space-close"></script>
-    <script defer src="../config/js/viewer.js?v=20260501-space-close"></script>
-    <script defer src="../config/js/audio-lyrics.js?v=20260501-space-close"></script>
-    <script defer src="../config/js/audio-init.js?v=20260501-space-close"></script>
-    <script defer src="../config/js/audio-player.js?v=20260501-space-close"></script>
+    <script defer src="../config/js/favorites.js?v=20260923-favdrag6"></script>
+    <script defer src="../config/js/viewer.js?v=20260923-openfix"></script>
+    <script defer src="../config/js/audio-lyrics.js?v=20260923-lyrics"></script>
+    <script defer src="../config/js/audio-init.js?v=20260923-stagger"></script>
+    <script defer src="../config/js/audio-player.js?v=20260923-coverframe"></script>
     <script defer src="../config/js/subtitles.js?v=20260501-space-close"></script>
-    <script defer src="../config/js/interactions.js?v=20260501-space-close"></script>
+    <script defer src="../config/js/interactions.js?v=20260923-iconrot2"></script>
     <script defer src="../config/js/drag.js?v=20260501-space-close"></script>
     <script defer src="../config/js/lifecycle.js?v=20260501-space-close"></script>
     <script defer src="../config/js/app.js?v=20260501-space-close"></script>
@@ -47,6 +47,11 @@
             </svg>
         </button>
         <div class="nav-controls">
+            <button class="icon-btn" id="btnGoUp" onclick="app.goUp()" title="向上级">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <use href="#icon-btnGoUp"></use>
+                </svg>
+            </button>
             <button class="icon-btn" id="btnBack" onclick="app.goBack()" disabled title="后退">
                 <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                     <use href="#icon-btnBack"></use>
@@ -55,11 +60,6 @@
             <button class="icon-btn" id="btnForward" onclick="app.goForward()" disabled title="前进">
                 <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                     <use href="#icon-btnForward"></use>
-                </svg>
-            </button>
-            <button class="icon-btn" id="btnGoUp" onclick="app.goUp()" title="向上级">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <use href="#icon-btnGoUp"></use>
                 </svg>
             </button>
             <button class="icon-btn" id="btnRefresh" onclick="app.refresh()" title="刷新">
@@ -79,7 +79,7 @@
                 </svg>
             </div>
         </div>
-        <button class="icon-btn" onclick="app.sort('name')" title="排序">
+        <button class="icon-btn" id="sortBtn" onclick="app.sort('name')" title="排序">
             <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                 <use href="#icon-sort"></use>
             </svg>
@@ -89,8 +89,8 @@
                 <path d="M2 2.5A1.5 1.5 0 0 1 3.5 1h3A1.5 1.5 0 0 1 8 2.5v3A1.5 1.5 0 0 1 6.5 7h-3A1.5 1.5 0 0 1 2 5.5v-3zM3.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM9 2.5A1.5 1.5 0 0 1 10.5 1h2A1.5 1.5 0 0 1 14 2.5v3A1.5 1.5 0 0 1 12.5 7h-2A1.5 1.5 0 0 1 9 5.5v-3zM10.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-2zM2 10.5A1.5 1.5 0 0 1 3.5 9h3A1.5 1.5 0 0 1 8 10.5v3A1.5 1.5 0 0 1 6.5 15h-3A1.5 1.5 0 0 1 2 13.5v-3zM3.5 10a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM9 10.5A1.5 1.5 0 0 1 10.5 9h2a1.5 1.5 0 0 1 1.5 1.5v3A1.5 1.5 0 0 1 12.5 15h-2A1.5 1.5 0 0 1 9 13.5v-3zM10.5 10a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-2z"></path>
             </svg>
         </button>
-        <button class="icon-btn" onclick="app.toggleTheme()" title="切换主题">
-            <span id="themeToggleIcon">☀</span>
+        <button class="icon-btn" onclick="app.toggleTheme(event)" title="切换主题">
+            <span id="themeToggleIcon"><svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><use href="#icon-sun"></use></svg></span>
         </button>
         <button class="icon-btn" onclick="app.toggleSettingsMenu(event)" title="更多选项">
             <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -105,12 +105,14 @@
     </header>
     <div id="viewMenu" class="flyout-menu">
         <div class="menu-item" onclick="app.setView('grid')">
-            <span class="menu-icon">⊞</span> <span class="menu-label">大图标 (Grid)</span> <span class="menu-check"
-                id="checkGrid">✓</span>
+            <span class="menu-icon"><svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><use href="#icon-view"></use></svg></span>
+            <span class="menu-label">大图标 (Grid)</span>
+            <span class="menu-check" id="checkGrid"><svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><use href="#icon-check"></use></svg></span>
         </div>
         <div class="menu-item" onclick="app.setView('list')">
-            <span class="menu-icon">≣</span> <span class="menu-label">详细信息 (List)</span> <span class="menu-check"
-                id="checkList">✓</span>
+            <span class="menu-icon"><svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><use href="#icon-list-view"></use></svg></span>
+            <span class="menu-label">详细信息 (List)</span>
+            <span class="menu-check" id="checkList"><svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><use href="#icon-check"></use></svg></span>
         </div>
     </div>
     <div id="settingsMenu" class="flyout-menu">
@@ -125,26 +127,28 @@
         <div class="menu-separator"></div>
         <div class="menu-caption">打开方式</div>
         <div class="menu-item" onclick="app.setOpenMethod('overlay')">
-            <span class="menu-label">本页预览</span> <span class="menu-check" id="checkOverlay">✓</span>
+            <span class="menu-label">本页预览</span>
+            <span class="menu-check" id="checkOverlay"><svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><use href="#icon-check"></use></svg></span>
         </div>
         <div class="menu-item" onclick="app.setOpenMethod('newWindow')">
-            <span class="menu-label">新窗口打开</span> <span class="menu-check" id="checkNewWin">✓</span>
+            <span class="menu-label">新窗口打开</span>
+            <span class="menu-check" id="checkNewWin"><svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><use href="#icon-check"></use></svg></span>
         </div>
     </div>
     <div class="layout-container">
         <aside class="sidebar" id="sidebar">
-            <div class="sidebar-group-title"><span>📌 快速访问</span></div>
+            <div class="sidebar-group-title"><span><svg width="20" height="20" viewBox="0 0 24 24"><use href="#icon-quick-pin"></use></svg>快速访问</span></div>
             <div class="sidebar-item" id="defaultNav" onclick="app.navigateTo(app.config.defaultPath)">
-                <span class="file-icon" style="font-size:16px">📂</span> 共享目录
+                <span class="file-icon"><svg width="20" height="20" viewBox="0 0 48 48"><use href="#icon-nav-folder"></use></svg></span> 共享目录
             </div>
             <div class="sidebar-group-title">
-                <div class="tree-toggle" onclick="app.toggleTree(this)">▼</div>
-                <span onclick="app.navigateTo('')" style="cursor:pointer">🖥️ 此电脑</span>
+                <div class="tree-toggle" onclick="app.toggleTree(this)"><svg width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><use href="#icon-chevron"></use></svg></div>
+                <span onclick="app.navigateTo('')" style="cursor:pointer"><svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><use href="#icon-pc"></use></svg>此电脑</span>
             </div>
             <div class="tree-children open" id="driveList">
                 <div class="sidebar-empty">加载中...</div>
             </div>
-            <div class="sidebar-group-title"><span>❤️ 收藏</span></div>
+            <div class="sidebar-group-title"><span><svg width="18" height="18" viewBox="0 0 16 16"><use href="#icon-heart"></use></svg>收藏</span></div>
             <div id="favList">
                 <div class="sidebar-empty">暂无收藏文件</div>
             </div>
@@ -210,17 +214,25 @@
     <div class="task-bar" id="taskBar" style="display: none;"></div>
     <footer class="status-bar">
         <div id="statusLeft">就绪</div>
-        <div class="pagination-controls">
-            <button class="icon-btn" onclick="app.jumpToPage(1)" style="width:24px;height:24px;"
-                title="首页">&lt;&lt;</button>
-            <button class="icon-btn" onclick="app.prevPage()" style="width:24px;height:24px;" title="上一页">&lt;</button>
-            <span>第</span>
-            <input type="number" id="pageInput" class="page-input" value="1" min="1"
-                onchange="app.jumpToPage(this.value)">
-            <span id="totalPages">/ 1 页</span>
-            <button class="icon-btn" onclick="app.nextPage()" style="width:24px;height:24px;" title="下一页">&gt;</button>
-            <button class="icon-btn" onclick="app.jumpToPage(-1)" style="width:24px;height:24px;"
-                title="尾页">&gt;&gt;</button>
+        <div class="pagination-controls" id="paginationControls">
+            <button class="page-btn" id="pageFirstBtn" onclick="app.jumpToPage(1)" title="首页" aria-label="首页">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8.854 12.6a.5.5 0 0 1-.708 0L3.854 8.354a.5.5 0 0 1 0-.708L8.146 3.4a.5.5 0 1 1 .708.708L5.207 8l3.647 3.592a.5.5 0 0 1 0 .708z"/><path d="M12.854 12.6a.5.5 0 0 1-.708 0L7.854 8.354a.5.5 0 0 1 0-.708L12.146 3.4a.5.5 0 0 1 .708.708L9.207 8l3.647 3.592a.5.5 0 0 1 0 .708z"/></svg>
+            </button>
+            <button class="page-btn" id="pagePrevBtn" onclick="app.prevPage()" title="上一页" aria-label="上一页">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M10.354 12.6a.5.5 0 0 1-.708 0L5.354 8.354a.5.5 0 0 1 0-.708L9.646 3.4a.5.5 0 1 1 .708.708L6.707 8l3.647 3.592a.5.5 0 0 1 0 .708z"/></svg>
+            </button>
+            <div class="page-indicator">
+                <input type="number" id="pageInput" class="page-input" value="1" min="1" aria-label="页码"
+                    onchange="app.jumpToPage(this.value)" onkeydown="if(event.key==='Enter'){app.jumpToPage(this.value);this.blur();}">
+                <span class="page-sep">/</span>
+                <span id="totalPages">1</span>
+            </div>
+            <button class="page-btn" id="pageNextBtn" onclick="app.nextPage()" title="下一页" aria-label="下一页">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M5.646 12.6a.5.5 0 0 0 .708 0L10.646 8.354a.5.5 0 0 0 0-.708L6.354 3.4a.5.5 0 1 0-.708.708L9.293 8l-3.647 3.592a.5.5 0 0 0 0 .708z"/></svg>
+            </button>
+            <button class="page-btn" id="pageLastBtn" onclick="app.jumpToPage(-1)" title="尾页" aria-label="尾页">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M3.854 12.6a.5.5 0 0 1 0-.708L7.793 8 3.854 4.108a.5.5 0 1 1 .708-.708l4.292 4.25a.5.5 0 0 1 0 .708l-4.292 4.25a.5.5 0 0 1-.708 0z"/><path d="M8.854 12.6a.5.5 0 0 1 0-.708L12.793 8 8.854 4.108a.5.5 0 1 1 .708-.708l4.292 4.25a.5.5 0 0 1 0 .708l-4.292 4.25a.5.5 0 0 1-.708 0z"/></svg>
+            </button>
         </div>
     </footer>
     <div id="viewerModal" class="viewer-modal">

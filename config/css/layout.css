@@ -73,36 +73,129 @@
 /* --- 底部状态栏 (Footer) --- */
 .status-bar {
     height: auto;
-    min-height: 28px;
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-top: 4px;
-    padding-bottom: 4px;
+    min-height: 36px;
+    padding-top: 6px;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom));
+    padding-left: 14px;
+    padding-right: 10px;
     background-color: var(--bg-mica);
-    border-top: 1px solid var(--border-color);
+    border-top: 1px solid var(--static-hairline);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-left: 12px;
-    padding-right: 12px;
+    gap: 12px;
     font-size: 12px;
     color: var(--text-secondary);
     z-index: 10;
     flex-shrink: 0;
 }
 
+#statusLeft {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    opacity: 0.9;
+}
+
 .pagination-controls {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 1px;
+    flex-shrink: 0;
+    padding: 2px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    box-shadow: none;
+}
+
+.page-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 26px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    opacity: 0.75;
+    transition: background-color var(--motion-fast), color var(--motion-fast), opacity var(--motion-fast);
+}
+
+.page-btn:hover:not(:disabled) {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    opacity: 1;
+}
+
+.page-btn:active:not(:disabled) {
+    background: var(--accent-bg);
+    color: var(--accent-color);
+    opacity: 1;
+}
+
+.page-btn:disabled {
+    opacity: 0.28;
+    cursor: default;
+}
+
+.page-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-width: 64px;
+    height: 26px;
+    padding: 0 8px;
+    margin: 0 3px;
+    border-radius: 6px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-secondary);
+    font-weight: 500;
+    letter-spacing: 0.02em;
 }
 
 .page-input {
-    width: 36px;
-    text-align: center;
-    border: 1px solid var(--border-color);
-    border-radius: 3px;
-    background: var(--bg-address);
+    width: 26px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
     color: var(--text-primary);
+    font: inherit;
     font-size: 12px;
-    padding: 2px;
+    font-weight: 600;
+    text-align: center;
+    padding: 0;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.page-input::-webkit-outer-spin-button,
+.page-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.page-input:focus {
+    background: var(--bg-address);
+    box-shadow: 0 0 0 1.5px var(--accent-color);
+    color: var(--text-primary);
+}
+
+.page-sep {
+    color: var(--text-secondary);
+    font-weight: 400;
+    opacity: 0.55;
+}
+
+#totalPages {
+    color: var(--text-secondary);
+    font-weight: 500;
 }

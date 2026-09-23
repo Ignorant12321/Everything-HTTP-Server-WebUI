@@ -30,7 +30,7 @@ function attachApiMethods(app) {
     };
 
   app.fetchData = async function fetchData(isExplicitFolder) {
-        this.dom.list.innerHTML = `<div class="center-msg">⏳ 加载中...</div>`;
+        this.dom.list.innerHTML = `<div class="center-msg"><svg class="loading-icon" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><use href="#icon-spinner"></use></svg><span>加载中...</span></div>`;
         try {
             if (window.location.protocol === 'file:' || window.location.protocol === 'blob:') throw new Error('DEMO');
 

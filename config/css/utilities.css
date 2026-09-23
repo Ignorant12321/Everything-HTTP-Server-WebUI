@@ -126,8 +126,13 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 10px;
     height: 100%;
     color: var(--text-secondary);
+}
+
+.loading-icon {
+    animation: spin 1s linear infinite;
 }
 
 /* --- 清除按钮：文字飞走特效 --- */
@@ -196,6 +201,78 @@
 .anim-rotate {
     /* 0.5s 完成旋转，ease-in-out 让开始和结束时速度稍慢，更有质感 */
     animation: spin-360 0.5s ease-in-out;
+}
+
+/* 主题圆形扩散：View Transitions 期间关闭元素过渡，保证新旧快照颜色干净 */
+html.theme-no-transition,
+html.theme-no-transition *,
+html.theme-no-transition *::before,
+html.theme-no-transition *::after {
+    transition: none !important;
+}
+
+@property --theme-reveal-x {
+    syntax: '<length>';
+    inherits: true;
+    initial-value: 50vw;
+}
+
+@property --theme-reveal-y {
+    syntax: '<length>';
+    inherits: true;
+    initial-value: 50vh;
+}
+
+@property --theme-reveal-r {
+    syntax: '<length>';
+    inherits: true;
+    initial-value: 150vmax;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+    z-index: 1;
+}
+
+::view-transition-new(root) {
+    z-index: 2;
+    clip-path: circle(0 at var(--theme-reveal-x) var(--theme-reveal-y));
+    animation: theme-circle-reveal 0.55s cubic-bezier(0.2, 0, 0, 1) forwards;
+}
+
+@keyframes theme-circle-reveal {
+    to {
+        clip-path: circle(var(--theme-reveal-r) at var(--theme-reveal-x) var(--theme-reveal-y));
+    }
+}
+
+/* 主题图标：随圆形扩散同步旋转（补回原 anim-rotate 效果） */
+::view-transition-old(theme-toggle-icon),
+::view-transition-new(theme-toggle-icon) {
+    animation: spin-360 0.5s ease-in-out;
+    mix-blend-mode: normal;
+    height: 100%;
+    overflow: clip;
+}
+
+::view-transition-group(theme-toggle-icon) {
+    z-index: 3;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-new(root) {
+        animation-duration: 0.01ms;
+    }
+
+    ::view-transition-old(theme-toggle-icon),
+    ::view-transition-new(theme-toggle-icon) {
+        animation-duration: 0.01ms;
+    }
 }
 
 .anim-entry {
