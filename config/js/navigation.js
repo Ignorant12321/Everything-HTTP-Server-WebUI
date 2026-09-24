@@ -61,7 +61,7 @@ function attachNavigationMethods(app) {
         const parts = this.state.currentPath.split('\\');
         while (parts.length && !parts[parts.length - 1]) parts.pop();
         parts.pop();
-        if (parts.length === 0) { this.navigateTo(''); return; }
+        if (parts.length === 0) { this.navigateTo('root:'); return; }
         let parent = parts.join('\\');
         if (/^[a-zA-Z]:$/.test(parent)) parent += '\\';
         this.navigateTo(parent, true); // 向上一定是进入文件夹

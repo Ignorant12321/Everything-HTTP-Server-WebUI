@@ -39,6 +39,8 @@ defaultPath=D:\Data\Share
 
 ### 配置
 
+> Everything 1.5版本不提供http服务器，改为了插件启用。需要下载插件启用功能：[Plugins - voidtools](https://www.voidtools.com/support/everything/plugins/#http)
+
 打开Everything软件，并开启Everything的HTTP服务器。配置如下：
   ![alt text](.assest/image-5.png)
 

@@ -19,7 +19,7 @@ function createState() {
         openMethod: localStorage.getItem('openMethod') || 'overlay', // 文件打开方式：overlay(浮层)/newtab(新标签)
         theme: localStorage.getItem('theme') || 'light', // 主题模式：light(亮色)/dark(暗色)
         isNavigatingHistory: false,    // 是否正在执行历史记录导航（前进/后退），用于防止重复操作
-        imageZoom: 1,                  // 图片预览的缩放比例（1=100%）
+        imageZoom: 0.9,                // 图片预览的缩放比例（0.9=90%）
         imagePos: { x: 0, y: 0 },      // 图片预览的拖拽偏移位置（x/y轴）
         columns: [                     // 文件列表的列配置（表格视图）
             { id: 'icon', width: 40, label: '', resize: false },    // 图标列：宽度40px，不可调整

@@ -13,11 +13,14 @@ function attachApiMethods(app) {
         try {
             if (window.location.protocol === 'file:' || window.location.protocol === 'blob:') throw new Error('DEMO');
 
-            const res = await fetch(`/?search=root:&json=1&count=100`);
+            const res = await fetch(`/?search=root:&json=1&count=100&sort=name&ascending=1`);
             const data = await res.json(); // 解析接口返回的JSON数据
 
             let html = '';
-            (data.results || []).forEach(d => {
+            const drives = (data.results || []).slice().sort((a, b) =>
+                String(a.name).localeCompare(String(b.name), undefined, { numeric: true, sensitivity: 'base' })
+            );
+            drives.forEach(d => {
                 const path = d.name.endsWith(':') ? d.name + '\\' : d.name;
                 const label = d.name.endsWith(':') ? `Disk: ${d.name.charAt(0)}` : d.name;
                 html += `<div class="sidebar-item" onclick="app.navigateTo('${path.replace(/\\/g, '\\\\')}', true)"><span class="file-icon" style="font-size:16px">${svg_disk}</span> ${label}</div>`;

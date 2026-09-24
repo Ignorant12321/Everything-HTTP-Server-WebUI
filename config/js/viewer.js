@@ -45,7 +45,7 @@ function attachViewerMethods(app) {
             this.dom.viewerSubBtn.style.display = 'none';
         }
 
-        this.state.imageZoom = 1; this.state.imagePos = { x: 0, y: 0 };
+        this.state.imageZoom = 0.9; this.state.imagePos = { x: 0, y: 0 };
         this.dom.viewerTitle.textContent = file.name;
         this.dom.viewerDownloadBtn.href = file.url;
         this.dom.viewerDownloadBtn.download = file.name;
@@ -72,7 +72,7 @@ function attachViewerMethods(app) {
                 if (file.type === 'img') {
                     newContainer.innerHTML = `
                                 <div class="image-viewer-container" onwheel="app.zoomImage(event)" onmousedown="app.startDragImage(event)">
-                                    <img id="viewerImage-${file.uniqueId}" src="${file.url}" style="transform: translate(0px, 0px) scale(1);">
+                                    <img id="viewerImage-${file.uniqueId}" src="${file.url}" style="transform: translate(0px, 0px) scale(0.9);">
                                 </div>
                             `;
                 } else if (file.type === 'audio') {

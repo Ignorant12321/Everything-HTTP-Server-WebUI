@@ -176,12 +176,15 @@ function attachBreadcrumbMethods(app) {
     let folders = [];
     try {
       if (!folderPath) {
-        const res = await fetch('/?search=root:&json=1&count=100');
+        const res = await fetch('/?search=root:&json=1&count=100&sort=name&ascending=1');
         const data = await res.json();
-        folders = (data.results || []).map((d) => {
-          const path = d.name.endsWith(':') ? d.name + '\\' : d.name;
-          return { name: d.name, path: path, isFolder: true };
-        });
+        folders = (data.results || [])
+          .slice()
+          .sort((a, b) => String(a.name).localeCompare(String(b.name), undefined, { numeric: true, sensitivity: 'base' }))
+          .map((d) => {
+            const path = d.name.endsWith(':') ? d.name + '\\' : d.name;
+            return { name: d.name, path: path, isFolder: true };
+          });
       } else {
         const items = await this.fetchFolderChildren(folderPath);
         folders = items.filter((item) => this.isFolderItem(item)).map((item) => ({
